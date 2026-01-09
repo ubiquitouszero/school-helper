@@ -1,0 +1,145 @@
+{
+  "metadata": {
+    "projectName": "{{PROJECT_NAME}}",
+    "lastUpdated": "{{DATE}}",
+    "launchDate": "{{LAUNCH_DATE}}",
+    "currentStatus": "Project Initialized",
+    "projectPhase": "R0 - Discovery",
+    "daysUntilLaunch": 0,
+    "velocity": {
+      "avgCommitsPerDay": 0,
+      "avgCommitsPerWeek": 0,
+      "avgStoryPointsPerSession": 0,
+      "workingDaysTracked": 0,
+      "totalCommits": 0,
+      "totalStoryPoints": 0,
+      "developmentPeriod": "{{MONTH}} {{YEAR}}",
+      "currentSprint": "R0 - Discovery",
+      "nextPlannedSprint": "R1 - MVP",
+      "avgStoryPointsPerDay": 0
+    },
+    "currentSprint": "R0 - Discovery",
+    "nextPlannedSprint": "R1 - MVP"
+  },
+  "tasks": [
+    {
+      "id": "P0-1",
+      "uuid": "{{DATE}}-discovery-requirements",
+      "title": "Requirements Discovery",
+      "description": "Understand project requirements, constraints, and success criteria.",
+      "isMVP": true,
+      "priority": "P0",
+      "effort": "S",
+      "effortDays": 1,
+      "estimatedCommits": 2,
+      "storyPoints": 3,
+      "risk": "Low",
+      "confidence": "Medium",
+      "status": "not_started",
+      "startDate": null,
+      "targetDate": null,
+      "actualEndDate": null,
+      "blockedBy": [],
+      "blocks": [],
+      "riskFactors": [],
+      "historicalReference": null,
+      "commits": []
+    }
+  ],
+  "releases": [
+    {
+      "id": "R0-Discovery",
+      "name": "R0: Discovery & Requirements",
+      "theme": "Research",
+      "targetDate": null,
+      "status": "in_progress",
+      "projects": ["P0-1"],
+      "totalCommits": 2,
+      "completedCommits": 0,
+      "percentComplete": 0,
+      "description": "Understand requirements, research integrations",
+      "keyFeatures": [],
+      "risks": []
+    },
+    {
+      "id": "R1-MVP",
+      "name": "R1: Minimum Viable Product",
+      "theme": "Core Functionality",
+      "targetDate": null,
+      "status": "not_started",
+      "projects": [],
+      "totalCommits": 0,
+      "completedCommits": 0,
+      "percentComplete": 0,
+      "description": "Working prototype with core functionality",
+      "keyFeatures": [],
+      "risks": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "main-project",
+      "name": "{{PROJECT_NAME}}",
+      "description": "{{PROJECT_DESCRIPTION}}",
+      "status": "not_started",
+      "progressPercent": 0,
+      "healthAnalysis": "Project initialized. Awaiting requirements discovery.",
+      "estimatedDays": 0,
+      "storyPoints": 3
+    }
+  ],
+  "completedWork": [],
+  "historicalFeatures": [],
+  "burnUpData": {
+    "dataPoints": [
+      {
+        "date": "{{DATE}}",
+        "label": "Project Start",
+        "completed": 0,
+        "remaining": 3,
+        "total": 3
+      }
+    ],
+    "totalScope": 3,
+    "completedScope": 0,
+    "percentComplete": 0
+  },
+  "weeklyAnalysis": [
+    {
+      "week": "{{WEEK}}",
+      "startDate": "{{DATE}}",
+      "endDate": "{{END_DATE}}",
+      "commits": 0,
+      "storyPoints": 0,
+      "aiSummary": "Project initialized with Signal tracking infrastructure.",
+      "keyAccomplishments": [
+        "Repository created",
+        "Signal dashboard deployed"
+      ],
+      "risks": [],
+      "recommendations": []
+    }
+  ],
+  "velocityInsights": {
+    "aiAnalysis": "Project just initialized. No velocity data yet.",
+    "projectPhase": "R0 - Discovery",
+    "sprintStatus": "Starting",
+    "risks": [],
+    "recommendations": [
+      "Complete requirements discovery",
+      "Define MVP scope",
+      "Identify key risks early"
+    ]
+  },
+  "mvpScope": {
+    "description": "{{MVP_DESCRIPTION}}",
+    "status": "Not Started",
+    "totalCommits": 0,
+    "completedCommits": 0,
+    "percentComplete": 0,
+    "userReadyPercent": 0,
+    "phase1Complete": false,
+    "totalStoryPoints": 3
+  },
+  "currentBlockers": []
+}

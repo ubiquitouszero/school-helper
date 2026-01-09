@@ -1,0 +1,112 @@
+{
+  "comment": "Claude Code Settings Template - Copy to .claude/settings.local.json in your project",
+
+  "autoApprovedCommands": [
+    "Read(**)",
+    "Glob(**)",
+    "Grep(**)",
+    "Bash(ls:*)",
+    "Bash(git status:*)",
+    "Bash(git log:*)",
+    "Bash(git diff:*)",
+    "Bash(cat:*)",
+    "Bash(grep:*)",
+    "Bash(find:*)",
+    "Bash(pytest:*)",
+    "Bash(python manage.py test:*)",
+    "Bash(npm test:*)"
+  ],
+
+  "comment_git": "Auto-approve common git operations (read-only)",
+  "gitAutoApprove": {
+    "status": true,
+    "log": true,
+    "diff": true,
+    "show": true
+  },
+
+  "comment_skills": "Enable AI development skills",
+  "enabledSkills": [
+    "session-documentation",
+    "signal-story-points",
+    "signal-session-ratings"
+  ],
+
+  "comment_commit": "Git commit template with co-authorship",
+  "commitMessageTemplate": "{message}\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+
+  "comment_project": "Project-specific settings - CUSTOMIZE THESE",
+  "projectName": "YOUR_PROJECT_NAME",
+  "primaryLanguage": "python",
+
+  "comment_paths": "Common project paths - adjust as needed",
+  "paths": {
+    "backend": "./backend",
+    "frontend": "./frontend",
+    "docs": "./docs",
+    "tests": "./tests",
+    "sessions": "./project-management/sessions"
+  },
+
+  "comment_testing": "Test execution preferences",
+  "testCommand": "python manage.py test",
+  "testCoverage": true,
+
+  "comment_linting": "Auto-format on save",
+  "autoFormat": {
+    "python": ["black", "isort"],
+    "javascript": ["prettier"],
+    "typescript": ["prettier"]
+  },
+
+  "comment_documentation": "Auto-generate docs",
+  "autoDocumentation": {
+    "sessions": true,
+    "adr": true,
+    "apiDocs": false
+  },
+
+  "comment_velocity": "Story point tracking",
+  "velocityTracking": {
+    "enabled": true,
+    "rubric": {
+      "complexity": {
+        "trivial": 1,
+        "simple": 2,
+        "moderate": 3,
+        "complex": 5,
+        "very_complex": 8
+      },
+      "scope": {
+        "single_file": 1,
+        "few_files": 2,
+        "module": 3,
+        "multiple_modules": 4,
+        "system_wide": 5
+      },
+      "risk": {
+        "none": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3
+      }
+    }
+  },
+
+  "comment_safety": "Safety and security settings",
+  "safety": {
+    "requireApprovalForDelete": true,
+    "requireApprovalForDatabaseMigrations": true,
+    "requireApprovalForProductionDeploy": true,
+    "autoBackupBeforeDestructive": true
+  },
+
+  "comment_notes": "Usage Notes",
+  "_usage_notes": [
+    "1. Copy this file to .claude/settings.local.json in your project root",
+    "2. Customize projectName, paths, and other project-specific settings",
+    "3. Add additional autoApprovedCommands as you identify safe patterns",
+    "4. Enable/disable skills based on your workflow",
+    "5. Adjust velocity rubric to match your team's complexity scale"
+  ]
+}

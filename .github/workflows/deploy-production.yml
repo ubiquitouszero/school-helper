@@ -1,0 +1,116 @@
+# Template: Manual Production Deployment
+# Requires manual trigger and approval
+
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_sha:
+        description: 'Git SHA to deploy (defaults to latest staging deployment)'
+        required: false
+        type: string
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'production'
+      url: https://your-domain.com  # CUSTOMIZE THIS
+
+    steps:
+    - name: Notify Start
+      run: |
+        curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "🚀 *Production Deployment Started*",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "🚀 *Production Deployment Started*\n\n*Commit:* `${{ github.sha }}`\n*Triggered by:* ${{ github.actor }}"
+                }
+              }
+            ]
+          }'
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Production
+      run: |
+        SHA_TO_DEPLOY="${{ inputs.git_sha || github.sha }}"
+
+        az webapp config container set \
+          --name YOUR-APP-backend-production \
+          --resource-group YOUR-RESOURCE-GROUP \
+          --docker-custom-image-name ghcr.io/${{ github.repository_owner }}/YOUR-APP-backend:${SHA_TO_DEPLOY} \
+          --docker-registry-server-url https://ghcr.io \
+          --docker-registry-server-user ${{ github.repository_owner }} \
+          --docker-registry-server-password ${{ secrets.GHCR_PAT }}
+
+        az webapp restart --name YOUR-APP-backend-production --resource-group YOUR-RESOURCE-GROUP
+
+    - name: Run Production Smoke Tests
+      run: |
+        sleep 60  # Wait for restart
+
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://your-domain.com/health/ || echo "000")
+        if [ "$response" != "200" ] && [ "$response" != "403" ]; then
+          echo "Production health check failed with status: $response"
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-Type: application/json' \
+            -d '{"text":"❌ *PRODUCTION HEALTH CHECK FAILED*"}'
+          exit 1
+        fi
+        echo "Production health check passed"
+
+    - name: Notify Success
+      if: success()
+      run: |
+        curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "✅ *Production Deployment Successful*",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "✅ *Production Deployment Successful*\n\n*URL:* https://your-domain.com\n*Deployed by:* ${{ github.actor }}"
+                }
+              }
+            ]
+          }'
+
+    - name: Notify Failure
+      if: failure()
+      run: |
+        curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "❌ *PRODUCTION DEPLOYMENT FAILED*",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "❌ *PRODUCTION DEPLOYMENT FAILED*\n\n⚠️ *IMMEDIATE ACTION REQUIRED*\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>"
+                }
+              }
+            ]
+          }'
+
+# Customization Checklist:
+# [ ] Replace YOUR-APP with your application name
+# [ ] Replace YOUR-RESOURCE-GROUP with your resource group
+# [ ] Update your-domain.com with your production domain
+# [ ] Set up GitHub Environment protection rules for 'production'
+# [ ] Configure required reviewers for production deployments
+# [ ] Set up rollback workflow
+# [ ] Add database migration steps if needed
+# [ ] Configure monitoring and alerts

@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "project_name": "YOUR_PROJECT_NAME",
+    "created": "YYYY-MM-DD",
+    "last_updated": "YYYY-MM-DD",
+    "version": "1.0"
+  },
+  "backlog": [
+    {
+      "id": "TASK-001",
+      "title": "Example Task: Setup Project Infrastructure",
+      "description": "Initialize repository, configure CI/CD, set up development environment",
+      "status": "pending",
+      "story_points": 5,
+      "complexity": 2,
+      "scope": 2,
+      "risk": 1,
+      "priority": "high",
+      "category": "infrastructure",
+      "assigned_to": null,
+      "created_date": "YYYY-MM-DD",
+      "completed_date": null,
+      "session": null,
+      "notes": ""
+    },
+    {
+      "id": "TASK-002",
+      "title": "Example Task: Implement User Authentication",
+      "description": "Add user login, registration, password reset functionality",
+      "status": "pending",
+      "story_points": 8,
+      "complexity": 5,
+      "scope": 2,
+      "risk": 1,
+      "priority": "high",
+      "category": "feature",
+      "assigned_to": null,
+      "created_date": "YYYY-MM-DD",
+      "completed_date": null,
+      "session": null,
+      "notes": "Consider OAuth integration"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Example Task: Create API Documentation",
+      "description": "Document all API endpoints with examples and response formats",
+      "status": "pending",
+      "story_points": 3,
+      "complexity": 1,
+      "scope": 2,
+      "risk": 0,
+      "priority": "medium",
+      "category": "documentation",
+      "assigned_to": null,
+      "created_date": "YYYY-MM-DD",
+      "completed_date": null,
+      "session": null,
+      "notes": ""
+    }
+  ],
+  "categories": [
+    "feature",
+    "bugfix",
+    "infrastructure",
+    "documentation",
+    "refactoring",
+    "testing",
+    "security",
+    "performance"
+  ],
+  "priorities": [
+    "critical",
+    "high",
+    "medium",
+    "low"
+  ],
+  "statuses": [
+    "pending",
+    "in_progress",
+    "blocked",
+    "completed",
+    "cancelled"
+  ],
+  "story_point_rubric": {
+    "complexity": {
+      "trivial": 1,
+      "simple": 2,
+      "moderate": 3,
+      "complex": 5,
+      "very_complex": 8
+    },
+    "scope": {
+      "single_file": 1,
+      "few_files": 2,
+      "module": 3,
+      "multiple_modules": 4,
+      "system_wide": 5
+    },
+    "risk": {
+      "none": 0,
+      "low": 1,
+      "medium": 2,
+      "high": 3
+    }
+  },
+  "velocity_history": [
+    {
+      "session_id": "0001",
+      "date": "YYYY-MM-DD",
+      "story_points": 0,
+      "tasks_completed": []
+    }
+  ]
+}

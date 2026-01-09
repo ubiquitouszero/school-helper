@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal - Project Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            color: #1e293b;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .meta strong {
+            color: #2563eb;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .stat {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background: #f8fafc;
+            border-left: 4px solid;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .task-card:hover {
+            background: white;
+            transform: translateX(4px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card.p0 { border-color: #ef4444; }
+        .task-card.p1 { border-color: #f97316; }
+        .task-card.p2 { border-color: #eab308; }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #0f172a;
+            flex: 1;
+        }
+
+        .task-id {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* WCAG AA compliant contrast ratios (4.5:1 minimum) */
+        .badge.effort-xs { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+        .badge.effort-s { background: #cffafe; color: #0e7490; border: 1px solid #06b6d4; }
+        .badge.effort-m { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .badge.effort-l { background: #fed7aa; color: #9a3412; border: 1px solid #f97316; }
+        .badge.effort-xl { background: #fecaca; color: #991b1b; border: 1px solid #ef4444; }
+
+        .badge.risk-low { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .badge.risk-medium { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .badge.risk-high { background: #fed7aa; color: #9a3412; border: 1px solid #f97316; }
+        .badge.risk-critical { background: #fecaca; color: #991b1b; border: 1px solid #ef4444; }
+
+        .task-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .task-card.expanded .task-details {
+            max-height: 500px;
+        }
+
+        .task-expand-icon {
+            transition: transform 0.3s ease;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .task-card.expanded .task-expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .blocker-alert {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .blocker-alert h3 {
+            color: #991b1b;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .blocker-alert p {
+            color: #1f2937;
+        }
+
+        .blocker-alert strong {
+            color: #7f1d1d;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .kanban-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .kanban-column {
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            min-height: 400px;
+        }
+
+        .kanban-column-header {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kanban-column-count {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .kanban-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .kanban-task {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .kanban-task:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .kanban-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .kanban-task-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .kanban-task-id {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .kanban-task-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .mermaid-container {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .tab:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .tab.active {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .filter-btn.all.active {
+            background: #64748b;
+            border-color: #64748b;
+        }
+
+        .filter-btn.done.active {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .filter-btn.doing.active {
+            background: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .filter-btn.todo.active {
+            background: #6b7280;
+            border-color: #6b7280;
+        }
+
+        .weekly-summary {
+            background: #f5f3ff;
+            border-left: 4px solid #7c3aed;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ddd6fe;
+        }
+
+        .weekly-summary h3 {
+            color: #5b21b6;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .weekly-summary p {
+            color: #1f2937;
+        }
+
+        .weekly-summary ul {
+            margin-left: 1.5rem;
+            color: #374151;
+        }
+
+        .insight-box {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .insight-box h3 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .insight-box p {
+            color: #1f2937;
+        }
+
+        .recommendation {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid #bbf7d0;
+        }
+
+        .recommendation p {
+            color: #14532d;
+        }
+
+        .risk-item {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid #fecaca;
+        }
+
+        .risk-item p {
+            color: #7f1d1d;
+        }
+
+        /* Roadmap Styles */
+        .release-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .release-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+        }
+
+        .release-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .release-header h3 {
+            color: #0f172a;
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .release-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .release-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .release-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+
+        .release-card.expanded .release-details {
+            max-height: 5000px;
+            margin-top: 1.5rem;
+        }
+
+        .release-expand-icon {
+            transition: transform 0.3s ease;
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .release-card.expanded .release-expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .project-card {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .project-card h4 {
+            color: #0f172a;
+            margin: 0 0 0.75rem 0;
+            font-size: 1.1rem;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .project-features {
+            margin-top: 0.75rem;
+        }
+
+        .project-features ul {
+            margin-left: 1.5rem;
+            color: #334155;
+        }
+
+        .project-risks {
+            margin-top: 0.75rem;
+        }
+
+        .release-status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .release-status-in_progress {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .release-status-planned {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .release-status-backlog {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .chart-container {
+                height: 250px !important;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8125rem;
+            }
+
+            .task-card {
+                margin-bottom: 0.75rem;
+            }
+
+            .stat {
+                font-size: 2rem;
+            }
+
+            header > div {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            #exportReportsBtn {
+                width: 100%;
+            }
+
+            footer {
+                padding: 1.5rem 0;
+            }
+
+            /* New Features - Mobile Responsive */
+            /* Search bar */
+            #taskSearch {
+                font-size: 0.9rem;
+            }
+
+            /* Database tracker summary cards */
+            #databases .grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            /* Health score info modal */
+            #healthInfoModal > div {
+                max-width: 90vw !important;
+                margin: 1rem !important;
+            }
+
+            /* Commit heatmap - make scrollable */
+            #commitHeatmap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Effort accuracy cards - stack metrics vertically */
+            #effortAccuracy .card > div > div:first-child {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Overall speed banner - smaller text */
+            #effortAccuracy h3 {
+                font-size: 1rem !important;
+            }
+
+            #effortAccuracy > div:first-child > div:first-child {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .meta {
+                font-size: 0.8125rem;
+            }
+
+            .stat {
+                font-size: 1.75rem;
+            }
+
+            .tab {
+                font-size: 0.75rem;
+                padding: 0.5rem;
+            }
+
+            /* New Features - Extra Small Mobile */
+            /* Database tracker - single column */
+            #databases .grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Effort accuracy - smaller overall speed text */
+            #effortAccuracy > div:first-child > div:first-child {
+                font-size: 1.25rem !important;
+            }
+
+            /* Commit heatmap squares - slightly smaller */
+            #commitHeatmap > div > div > div {
+                width: 10px !important;
+                height: 10px !important;
+            }
+
+            /* Health info modal - more padding */
+            #healthInfoModal > div {
+                padding: 1rem !important;
+            }
+
+            /* Search indicator - smaller font */
+            #searchIndicator {
+                font-size: 0.75rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <h1><span style="-webkit-text-fill-color: initial;">🚀</span> <span id="projectName">Signal Dashboard</span></h1>
+                    <p class="meta">
+                        Last Updated: <strong id="lastUpdated">Loading...</strong> |
+                        Launch Date: <strong id="launchDate">Loading...</strong>
+                    </p>
+                    <div style="margin-top: 0.75rem; padding: 0.75rem 1rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; border-radius: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.25rem;">📋</span>
+                            <div>
+                                <strong style="color: #0c4a6e; font-size: 0.95rem;" id="projectStatus">Loading...</strong>
+                                <div style="color: #075985; font-size: 0.85rem; margin-top: 0.25rem;" id="projectPhase">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="exportReportsBtn" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); transition: all 0.2s ease;">
+                    📄 Export Reports
+                </button>
+            </div>
+        </header>
+
+        <!-- Velocity Stats -->
+        <!-- Project Health - Full Width -->
+        <div class="card" id="healthScoreCard" style="border: 2px solid #10b981; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <h2 id="healthScoreIcon" style="margin: 0;">🟢 Project Health</h2>
+                        <button onclick="showHealthInfo()" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 1rem; padding: 0; line-height: 1;" title="How is health calculated?">ℹ️</button>
+                    </div>
+                    <div id="healthAnalysisText" style="font-size: 0.85rem; line-height: 1.5; color: #64748b;">
+                        <!-- Populated by JavaScript with contextual analysis -->
+                    </div>
+                </div>
+                <div style="text-align: right; min-width: 120px;">
+                    <div class="stat" id="healthScore" style="font-size: 2.5rem; margin: 0;">...</div>
+                    <div class="stat-label" id="healthScoreLabel" style="font-size: 0.85rem;">Calculating...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>📈 Historical Velocity</h2>
+                <div class="stat" id="avgStoryPointsPerDay">...</div>
+                <div class="stat-label">Story Points/Day</div>
+            </div>
+            <div class="card">
+                <h2>📅 Working Days Tracked</h2>
+                <div class="stat" id="workingDays">...</div>
+                <div class="stat-label">Days with Commits</div>
+            </div>
+            <div class="card">
+                <h2>💻 Total Commits</h2>
+                <div class="stat" id="totalCommits">...</div>
+                <div class="stat-label">Since Aug 29, 2025</div>
+            </div>
+            <div class="card">
+                <h2>🎯 Progress</h2>
+                <div class="stat" id="percentComplete">...</div>
+                <div class="stat-label">% Complete (Stretch Goals)</div>
+            </div>
+            <div class="card" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6;">
+                <h2 style="color: #1e40af;">🚀 Next Release</h2>
+                <div class="stat" style="color: #1e40af;" id="mvpStatus">...</div>
+                <div class="stat-label" style="color: #1e40af;" id="mvpLabel">Calculating...</div>
+            </div>
+        </div>
+
+        <!-- Health Score Info Modal -->
+        <div id="healthInfoModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                    <h2 style="color: #0f172a; margin: 0;">🏥 Project Health Score</h2>
+                    <button onclick="closeHealthInfo()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; line-height: 1; padding: 0;">&times;</button>
+                </div>
+
+                <div style="color: #475569; line-height: 1.6;">
+                    <p style="margin-bottom: 1rem;">The health score is a <strong>0-100 metric</strong> that combines multiple factors to give you an at-a-glance view of project status.</p>
+
+                    <h3 style="color: #0f172a; margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem;">How It's Calculated:</h3>
+
+                    <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <strong style="color: #1e40af;">Starting Score: 100 points</strong>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: #0f172a; margin: 0 0 0.5rem 0;">1️⃣ Blockers</h4>
+                        <ul style="margin: 0 0 0 1.5rem; color: #64748b;">
+                            <li><strong>-20 points</strong> per active blocker</li>
+                            <li>Maximum penalty: <strong>-40 points</strong></li>
+                            <li>Why: Blockers prevent progress and need immediate attention</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: #0f172a; margin: 0 0 0.5rem 0;">2️⃣ Velocity Trend</h4>
+                        <ul style="margin: 0 0 0 1.5rem; color: #64748b;">
+                            <li>Compares last 2 weeks of work</li>
+                            <li><strong>+10 points</strong> if improving</li>
+                            <li><strong>-10 points</strong> if declining</li>
+                            <li>Why: Consistent or improving velocity means steady progress</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: #0f172a; margin: 0 0 0.5rem 0;">3️⃣ Active Risks</h4>
+                        <ul style="margin: 0 0 0 1.5rem; color: #64748b;">
+                            <li><strong>-10 points</strong> per identified risk</li>
+                            <li>Maximum penalty: <strong>-20 points</strong></li>
+                            <li>Why: Risks can derail the project if not managed</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: #0f172a; margin: 0 0 0.5rem 0;">4️⃣ Schedule Status</h4>
+                        <ul style="margin: 0 0 0 1.5rem; color: #64748b;">
+                            <li><strong>-15 points</strong> per release behind schedule</li>
+                            <li>Maximum penalty: <strong>-30 points</strong></li>
+                            <li>Why: Being behind schedule indicates need to adjust scope or resources</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="color: #0f172a; margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem;">Score Ranges:</h3>
+
+                    <div style="display: grid; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 4px solid #10b981; padding: 0.75rem; border-radius: 0.5rem;">
+                            <strong style="color: #065f46;">🟢 80-100: Healthy</strong>
+                            <div style="color: #047857; font-size: 0.9rem; margin-top: 0.25rem;">No major issues, good velocity, on track</div>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 0.75rem; border-radius: 0.5rem;">
+                            <strong style="color: #92400e;">🟡 60-79: Caution</strong>
+                            <div style="color: #b45309; font-size: 0.9rem; margin-top: 0.25rem;">Some concerns, monitor velocity and risks</div>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left: 4px solid #ef4444; padding: 0.75rem; border-radius: 0.5rem;">
+                            <strong style="color: #991b1b;">🔴 0-59: At Risk</strong>
+                            <div style="color: #b91c1c; font-size: 0.9rem; margin-top: 0.25rem;">Multiple blockers or behind schedule, needs attention</div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f1f5f9; border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem;">
+                        <p style="margin: 0; color: #475569; font-size: 0.9rem;">
+                            <strong>💡 Tip:</strong> Hover over the health score card to see which factors are currently affecting your score.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs: Executive View First, Developer View Last -->
+        <div class="tab-container">
+            <div class="tab active" onclick="showTab('overview')">Overview</div>
+            <div class="tab" onclick="showTab('roadmap')">🗺️ Product Roadmap</div>
+            <div class="tab" onclick="showTab('blockers')">🚨 Blockers & Risks</div>
+            <div class="tab" onclick="showTab('timeline')">Timeline</div>
+            <div class="tab" onclick="showTab('dependencies')">Dependencies</div>
+            <!-- <div class="tab" onclick="showTab('databases')">💾 Databases</div> -->
+            <div class="tab" onclick="showTab('burnup')">Burn-Up Chart</div>
+            <div class="tab" onclick="showTab('velocity')">Velocity Analysis</div>
+        </div>
+
+        <!-- Tab: Overview -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2>🎯 Task Breakdown by Priority</h2>
+                <div class="chart-container">
+                    <canvas id="priorityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem;">
+                <h2>📋 All Tasks (Click to Expand)</h2>
+
+                <!-- Search Bar -->
+                <div style="margin-bottom: 1rem;">
+                    <input
+                        type="text"
+                        id="taskSearch"
+                        placeholder="🔍 Search tasks by name, priority, or ID..."
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.95rem; transition: all 0.2s;"
+                        oninput="searchTasks(this.value)"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none';"
+                        onblur="this.style.borderColor='#e2e8f0';"
+                    />
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div class="filter-buttons">
+                        <button class="filter-btn all" onclick="filterTasks('all')">All Tasks</button>
+                        <button class="filter-btn done" onclick="filterTasks('completed')">✓ Done</button>
+                        <button class="filter-btn doing active" onclick="filterTasks('in_progress')">⏳ Doing</button>
+                        <button class="filter-btn todo" onclick="filterTasks('not_started')">○ To Do</button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="viewToggleList" class="filter-btn active" onclick="toggleView('list')" style="padding: 0.5rem 1rem;">📋 List</button>
+                        <button id="viewToggleKanban" class="filter-btn" onclick="toggleView('kanban')" style="padding: 0.5rem 1rem;">📊 Kanban</button>
+                    </div>
+                </div>
+                <div class="tasks-list" id="tasksList">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div id="kanbanBoard" style="display: none;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Blockers & Risks -->
+        <div id="blockers" class="tab-content">
+            <div class="card">
+                <h2>🚨 Current Blockers & Dependencies</h2>
+                <div id="blockersList"></div>
+            </div>
+
+        </div>
+
+        <!-- Tab: Burn-Up Chart -->
+        <div id="burnup" class="tab-content">
+            <div class="card">
+                <h2>📈 Multi-Release Burn-Up Chart</h2>
+                <p style="color: #94a3b8; margin-bottom: 1rem;">
+                    Tracks cumulative commits over time across multiple releases. Filter by timeframe to analyze velocity trends.
+                </p>
+
+                <!-- Time Filter Buttons -->
+                <div class="filter-buttons" style="margin-bottom: 1.5rem;">
+                    <button class="filter-btn active" onclick="filterBurnUp('all')">All Time</button>
+                    <button class="filter-btn" onclick="filterBurnUp('quarter')">Last Quarter</button>
+                    <button class="filter-btn" onclick="filterBurnUp('month')">Last Month</button>
+                    <button class="filter-btn" onclick="filterBurnUp('week')">Last Week</button>
+                </div>
+
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="burnUpChart"></canvas>
+                </div>
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+                    <h3 style="color: #0f172a; margin-bottom: 0.5rem; font-weight: 600;">📊 Scope Metrics</h3>
+                    <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <div style="color: #64748b; font-size: 0.85rem;">Completed Work</div>
+                            <div style="color: #059669; font-size: 1.5rem; font-weight: bold;" id="completedScope">...</div>
+                        </div>
+                        <div>
+                            <div style="color: #64748b; font-size: 0.85rem;">Remaining Work</div>
+                            <div style="color: #c2410c; font-size: 1.5rem; font-weight: bold;" id="remainingScope">...</div>
+                        </div>
+                        <div>
+                            <div style="color: #64748b; font-size: 0.85rem;">Total Scope</div>
+                            <div style="color: #1e40af; font-size: 1.5rem; font-weight: bold;" id="totalScope">...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Timeline -->
+        <div id="timeline" class="tab-content">
+            <div class="card">
+                <h2>📅 Project Timeline</h2>
+                <p style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                    Chronological view of completed sessions and work
+                </p>
+                <div id="timelineContent" style="position: relative; padding-left: 2rem;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Dependencies -->
+        <div id="dependencies" class="tab-content">
+            <div class="card">
+                <h2>🔗 Task Dependencies</h2>
+                <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.875rem;">
+                    Arrows show blocking relationships. A task can only start after all tasks pointing to it are complete.
+                </p>
+
+                <div id="dependenciesContent">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Velocity Analysis -->
+        <div id="velocity" class="tab-content">
+            <div id="weeklyAnalysisList"></div>
+
+            <!-- AI Velocity Insights -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h2>🎯 AI Velocity Insights</h2>
+                <div id="velocityInsights"></div>
+            </div>
+
+            <!-- Commit Activity Heatmap - Hidden (low value) -->
+            <div class="card" style="display: none;">
+                <h2>📅 Commit Activity Heatmap</h2>
+                <p style="color: #64748b; margin-bottom: 1rem; font-size: 0.9rem;">
+                    Shows commit activity over time. Darker colors = more commits. Hover for details.
+                </p>
+                <div id="commitHeatmap" style="overflow-x: auto;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Actual Velocity Analysis -->
+            <div class="card">
+                <h2>📊 Velocity by Task Size</h2>
+                <p style="color: #64748b; margin-bottom: 1rem; font-size: 0.9rem;">
+                    Story points delivered by effort size. Shows actual complexity distribution across completed work.
+                </p>
+                <div id="effortAccuracy">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🚀 Historical Features Delivered</h2>
+                <p style="color: #64748b; margin-bottom: 1rem; font-size: 0.875rem;">
+                    <strong>Y-axis shows:</strong> Sessions/day productivity (not commit count). Higher values = more productive sessions.
+                </p>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="velocityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Product Roadmap -->
+        <div id="roadmap" class="tab-content">
+            <div class="card">
+                <h2>🗺️ Product Roadmap - Multi-Release Overview</h2>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">
+                    Click on a release to expand and view projects, features, risks, and dependencies.
+                </p>
+                <div id="roadmapContent">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Databases -->
+        <div id="databases" class="tab-content">
+            <div class="card">
+                <h2>💾 Database Integration Status</h2>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">
+                    Track College Decoded's 25 databases: integration status, size, coverage, and last update.
+                </p>
+
+                <!-- Summary Cards -->
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 1.25rem; border-radius: 0.75rem; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <div style="font-size: 2rem; font-weight: 700;" id="dbIntegratedCount">0</div>
+                        <div style="opacity: 0.9; font-size: 0.875rem;">✅ Integrated</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 1.25rem; border-radius: 0.75rem; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <div style="font-size: 2rem; font-weight: 700;" id="dbStagedCount">0</div>
+                        <div style="opacity: 0.9; font-size: 0.875rem;">⏳ Staged</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); padding: 1.25rem; border-radius: 0.75rem; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <div style="font-size: 2rem; font-weight: 700;" id="dbNotIntegratedCount">0</div>
+                        <div style="opacity: 0.9; font-size: 0.875rem;">○ Not Started</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 1.25rem; border-radius: 0.75rem; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <div style="font-size: 2rem; font-weight: 700;" id="dbTotalSize">0 MB</div>
+                        <div style="opacity: 0.9; font-size: 0.875rem;">Total Size</div>
+                    </div>
+                </div>
+
+                <!-- Database List -->
+                <div id="databasesList">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attribution Footer -->
+    <footer style="margin-top: 3rem; padding: 2rem 0; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.875rem;">
+        <p style="margin: 0;">
+            Built for AI development by
+            <a href="https://askthehuman.com" target="_blank" rel="noopener" style="color: #2563eb; text-decoration: none; font-weight: 500;">Bert Carroll</a>
+            and
+            <a href="https://claude.ai" target="_blank" rel="noopener" style="color: #2563eb; text-decoration: none; font-weight: 500;">Claude Code</a>
+        </p>
+        <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.8125rem;">
+            Learn more about human-AI collaboration at
+            <a href="https://www.askthehuman.com/" target="_blank" rel="noopener" style="color: #6b7280; text-decoration: none;">askthehuman.com</a>
+        </p>
+    </footer>
+
+    <script>
+        // Load JSON data
+        let data = null;
+
+        // Cache busting: add timestamp to prevent browser caching
+        fetch('./backlog-data.json?v=' + new Date().getTime())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(jsonData => {
+                data = jsonData;
+                window.backlogData = jsonData; // Make data globally accessible for story points display
+                initializeDashboard();
+            })
+            .catch(error => {
+                console.error('Error loading backlog data:', error);
+                const errorMessage = `
+                    <div style="padding: 2rem; background: #450a0a; border-radius: 0.75rem; color: #fca5a5;">
+                        <h2>⚠️ Error Loading Dashboard Data</h2>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p style="margin-top: 1rem;"><strong>Solution:</strong> Use a local server: <code style="background: #1e293b; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">python -m http.server 8000</code></p>
+                        <p>Then open: <code style="background: #1e293b; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">http://localhost:8000</code></p>
+                    </div>
+                `;
+                document.querySelector('.container').innerHTML = errorMessage;
+            });
+
+        function initializeDashboard() {
+            // Update metadata
+            document.getElementById('projectName').textContent = data.metadata.projectName;
+            document.getElementById('lastUpdated').textContent = data.metadata.lastUpdated;
+            document.getElementById('launchDate').textContent = data.metadata.launchDate;
+
+            // Update project status
+            document.getElementById('projectStatus').textContent = data.metadata.currentStatus || 'Loading...';
+            document.getElementById('projectPhase').textContent = data.metadata.projectPhase || 'Loading...';
+            document.getElementById('avgStoryPointsPerDay').textContent = data.metadata.velocity.avgStoryPointsPerDay.toFixed(1);
+            document.getElementById('workingDays').textContent = data.metadata.velocity.workingDaysTracked;
+            document.getElementById('totalCommits').textContent = data.metadata.velocity.totalCommits;
+            document.getElementById('percentComplete').textContent = data.burnUpData.percentComplete.toFixed(1) + '%';
+
+            // Update Next Release status - find next incomplete release or use first in-progress
+            const releases = data.releases || [];
+            const nextRelease = releases.find(r => r.status === 'in_progress' || r.status === 'planning') || releases[0] || {};
+            const releaseTargetDate = nextRelease.targetDate || 'TBD';
+
+            // Count P0 tasks (all active P0s, not release-specific)
+            const allP0Tasks = data.tasks.filter(t => t.priority === 'P0' && t.status !== 'cancelled');
+            const p0Complete = allP0Tasks.filter(t => t.status === 'completed').length;
+            const p0Total = allP0Tasks.length;
+            const p0Percent = p0Total > 0 ? Math.round((p0Complete / p0Total) * 100) : 0;
+
+            if (p0Percent >= 100) {
+                document.getElementById('mvpStatus').textContent = '✓ READY';
+                document.getElementById('mvpLabel').textContent = `Target: ${releaseTargetDate}`;
+            } else {
+                document.getElementById('mvpStatus').textContent = `${p0Percent}%`;
+                document.getElementById('mvpLabel').textContent = `Target: ${releaseTargetDate} (${p0Complete}/${p0Total} P0 tasks)`;
+            }
+
+            // Calculate and display health score
+            calculateHealthScore();
+
+            // Render charts
+            renderPriorityChart();
+            renderBurnUpChart();
+            renderVelocityChart();
+
+            // Render lists
+            renderTasksList('in_progress');
+            renderBlockersList();
+            renderVelocityInsights();
+            renderWeeklyAnalysis();
+            updateBurnUpMetrics();
+
+            // Render timeline and dependencies
+            renderTimelineGantt();
+            renderDependencyGraph();
+
+            // Render roadmap and databases
+            renderRoadmap();
+            renderDatabases();
+
+            // Render velocity analysis enhancements
+            renderCommitHeatmap();
+            renderEffortAccuracy();
+        }
+
+        function renderPriorityChart() {
+            const ctx = document.getElementById('priorityChart').getContext('2d');
+            const priorities = ['P0', 'P1', 'P2', 'P3', 'P4'];
+
+            // Calculate story points (completed vs remaining) for each priority
+            const completedPoints = priorities.map(p =>
+                data.tasks.filter(t => t.priority === p && t.status === 'completed')
+                    .reduce((sum, t) => sum + (t.storyPoints || 0), 0)
+            );
+
+            const remainingPoints = priorities.map(p =>
+                data.tasks.filter(t => t.priority === p && t.status !== 'completed' && t.status !== 'cancelled')
+                    .reduce((sum, t) => sum + (t.storyPoints || 0), 0)
+            );
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: priorities,
+                    datasets: [
+                        {
+                            label: 'Completed',
+                            data: completedPoints,
+                            backgroundColor: ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#2563eb'],
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Remaining',
+                            data: remainingPoints,
+                            backgroundColor: ['#fca5a5', '#fdba74', '#fde047', '#86efac', '#93c5fd'],
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#94a3b8' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#e2e8f0' },
+                            title: {
+                                display: true,
+                                text: 'Story Points',
+                                color: '#64748b'
+                            }
+                        },
+                        x: {
+                            stacked: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Track current burn-up chart instance and time filter
+        let burnUpChartInstance = null;
+        let currentTimeFilter = 'all';
+
+        function renderBurnUpChart(timeFilter = 'all') {
+            const ctx = document.getElementById('burnUpChart').getContext('2d');
+            const burnUpData = data.burnUpData;
+            const mvpScope = data.mvpScope || {};
+            const releases = data.releases || [];
+
+            // Get actual data points
+            let actualDataPoints = [...burnUpData.dataPoints];
+
+            // Calculate velocity from actual data (use story points)
+            const firstDate = new Date(actualDataPoints[0].date);
+            const lastDate = new Date(actualDataPoints[actualDataPoints.length - 1].date);
+            const lastStoryPoints = actualDataPoints[actualDataPoints.length - 1].cumulativeStoryPoints || actualDataPoints[actualDataPoints.length - 1].cumulativeCommits || 0;
+            const daysDiff = Math.max(1, (lastDate - firstDate) / (1000 * 60 * 60 * 24));
+            const velocityPerDay = data.metadata.velocity.avgStoryPointsPerDay || 13.6;
+
+            // Extend to current date + 30 days
+            const today = new Date();
+            const futureDate = new Date(today);
+            futureDate.setDate(futureDate.getDate() + 30);
+
+            // Add projection points from last actual date to future
+            let projectionPoints = [];
+            let currentDate = new Date(lastDate);
+            currentDate.setDate(currentDate.getDate() + 1); // Start day after last actual
+            let projectedValue = lastStoryPoints;
+
+            while (currentDate <= futureDate) {
+                projectedValue += velocityPerDay;
+                projectionPoints.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    cumulativeStoryPoints: null, // No actual data
+                    projectedStoryPoints: Math.round(projectedValue),
+                    isProjection: true
+                });
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Combine actual and projection
+            let allDataPoints = [...actualDataPoints, ...projectionPoints];
+
+            // Filter data points by timeframe
+            let filteredDataPoints = allDataPoints;
+            if (timeFilter !== 'all') {
+                const days = { week: 7, month: 30, quarter: 90 }[timeFilter];
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - days);
+                filteredDataPoints = allDataPoints.filter(p => {
+                    const pointDate = new Date(p.date);
+                    return pointDate >= cutoffDate;
+                });
+            }
+
+            // Destroy existing chart if it exists
+            if (burnUpChartInstance) {
+                burnUpChartInstance.destroy();
+            }
+
+            // Create chart configuration
+            const releaseColors = ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+
+            burnUpChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: filteredDataPoints.map(d => d.date),
+                    datasets: [
+                        {
+                            label: 'Actual Story Points',
+                            data: filteredDataPoints.map(d => d.cumulativeStoryPoints || null),
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.3,
+                            order: 0
+                        },
+                        {
+                            label: 'Projected (Current Velocity)',
+                            data: filteredDataPoints.map(d => d.projectedStoryPoints || null),
+                            borderColor: '#f97316',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [10, 5],
+                            pointRadius: 0,
+                            pointStyle: 'circle',
+                            tension: 0,
+                            order: 1
+                        }
+                    ]
+                },
+                plugins: [{
+                    id: 'releaseMilestones',
+                    afterDatasetsDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const xAxis = chart.scales.x;
+                        const yAxis = chart.scales.y;
+
+                        // Draw release milestone lines
+                        releases.forEach((release, index) => {
+                            if (!release.targetDate) return;
+
+                            const releaseIndex = filteredDataPoints.findIndex(p => p.date === release.targetDate);
+                            if (releaseIndex < 0) return;
+
+                            const x = xAxis.getPixelForValue(releaseIndex);
+                            const color = releaseColors[index % releaseColors.length];
+
+                            // Draw vertical dashed line
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.setLineDash([8, 4]);
+                            ctx.strokeStyle = color;
+                            ctx.lineWidth = 2;
+                            ctx.moveTo(x, yAxis.top);
+                            ctx.lineTo(x, yAxis.bottom);
+                            ctx.stroke();
+                            ctx.restore();
+
+                            // Draw label
+                            ctx.save();
+                            ctx.fillStyle = color;
+                            ctx.font = 'bold 11px sans-serif';
+                            ctx.textAlign = 'center';
+                            const labelY = yAxis.top - 10 - (index * 15);
+                            ctx.fillText(release.name, x, labelY);
+                            ctx.restore();
+                        });
+
+                        // Draw original launch date line
+                        const launchDate = burnUpData.launchDate || '2025-07-24';
+                        const launchIndex = filteredDataPoints.findIndex(p => p.date === launchDate);
+
+                        if (launchIndex >= 0) {
+                            const x = xAxis.getPixelForValue(launchIndex);
+
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.setLineDash([8, 4]);
+                            ctx.strokeStyle = '#3b82f6';
+                            ctx.lineWidth = 3;
+                            ctx.moveTo(x, yAxis.top);
+                            ctx.lineTo(x, yAxis.bottom);
+                            ctx.stroke();
+                            ctx.restore();
+
+                            ctx.save();
+                            ctx.fillStyle = '#3b82f6';
+                            ctx.font = 'bold 12px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('LAUNCH DAY', x, yAxis.top + 15);
+                            ctx.restore();
+                        }
+                    }
+                }],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { color: '#94a3b8', padding: 15 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const point = filteredDataPoints[index];
+                                    return `${point.date} - ${point.label}`;
+                                },
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y} story points`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#94a3b8', stepSize: 20 },
+                            grid: { color: '#334155' },
+                            title: {
+                                display: true,
+                                text: 'Cumulative Story Points',
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8',
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Timeline',
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function filterBurnUp(timeframe) {
+            currentTimeFilter = timeframe;
+
+            // Update button states
+            const buttons = document.querySelectorAll('#burnup .filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Re-render chart with new filter
+            renderBurnUpChart(timeframe);
+        }
+
+        function renderVelocityChart() {
+            const ctx = document.getElementById('velocityChart').getContext('2d');
+
+            // Use story points if available, otherwise fall back to commits per day
+            const hasStoryPoints = data.historicalFeatures.some(f => f.storyPoints !== undefined);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.historicalFeatures.map(f => f.name),
+                    datasets: [{
+                        label: hasStoryPoints ? 'Story Points per Session' : 'Commits per Day',
+                        data: data.historicalFeatures.map(f => hasStoryPoints ? (f.storyPoints || 0) : f.commitsPerDay),
+                        backgroundColor: '#60a5fa'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#1e293b',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: hasStoryPoints ? 'Story Points' : 'Commits per Day',
+                                color: '#1e293b',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: { color: '#64748b' },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Session',
+                                color: '#1e293b',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateBurnUpMetrics() {
+            const burnUpData = data.burnUpData;
+            document.getElementById('completedScope').textContent = `${burnUpData.completedScope} story points`;
+            document.getElementById('remainingScope').textContent = `${burnUpData.totalScope - burnUpData.completedScope} story points`;
+            document.getElementById('totalScope').textContent = `${burnUpData.totalScope} story points`;
+        }
+
+        function getStatusBadge(status) {
+            const statusConfig = {
+                'completed': { label: '✓ Done', bg: '#d1fae5', color: '#065f46', border: '#10b981' },
+                'in_progress': { label: '⏳ Doing', bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+                'not_started': { label: '○ To Do', bg: '#f3f4f6', color: '#4b5563', border: '#d1d5db' }
+            };
+            const config = statusConfig[status] || statusConfig['not_started'];
+            return `<span class="badge" style="background: ${config.bg}; color: ${config.color}; border: 1px solid ${config.border}; font-weight: 600;">${config.label}</span>`;
+        }
+
+        let currentFilter = 'all';
+
+        function renderTasksList(filterStatus = 'all') {
+            const container = document.getElementById('tasksList');
+            let tasksToRender = data.tasks;
+
+            // Apply status filter
+            if (filterStatus !== 'all') {
+                tasksToRender = data.tasks.filter(task => task.status === filterStatus);
+            }
+
+            const sortedTasks = [...tasksToRender].sort((a, b) => {
+                const priorityOrder = ['P0', 'P1', 'P2', 'P3', 'P4'];
+                return priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority);
+            });
+
+            container.innerHTML = sortedTasks.map(task => `
+                <div class="task-card task-item ${task.priority.toLowerCase()}" data-task-id="${task.id}" onclick="toggleTask(this)">
+                    <div class="task-header">
+                        <div class="task-title">
+                            ${task.title}
+                            <span class="task-expand-icon">▶</span>
+                        </div>
+                        <div class="task-id">${task.id}</div>
+                    </div>
+                    ${task.description ? `
+                        <div style="margin: 0.5rem 0; color: #4b5563; font-size: 0.9rem; line-height: 1.4;">
+                            ${task.description}
+                        </div>
+                    ` : ''}
+                    <div class="task-meta">
+                        ${getStatusBadge(task.status)}
+                        <span class="badge effort-${task.effort.toLowerCase()}">${task.effort} (${task.effortDays}d)</span>
+                        <span class="badge risk-${task.risk.toLowerCase()}">${task.risk} Risk</span>
+                        ${task.storyPoints ? `<span style="color: #2563eb; font-weight: 600;">${task.storyPoints} points</span>` : `<span style="color: #64748b;">${task.estimatedCommits} commits</span>`}
+                        ${task.isMVP ? '<span class="badge" style="background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600;">MVP</span>' : '<span class="badge" style="background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db;">Stretch</span>'}
+                    </div>
+                    ${task.startDate ? `
+                        <div class="task-dates" style="color: #94a3b8; font-size: 0.85rem;">
+                            📅 ${task.startDate} → ${task.targetDate}
+                        </div>
+                    ` : '<div class="task-dates" style="color: #64748b; font-size: 0.85rem;">📅 Not scheduled yet</div>'}
+                    ${task.blockedBy && task.blockedBy.length > 0 ? `
+                        <div style="margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: #fef2f2; border: 1px solid #fecaca; border-left: 3px solid #dc2626; border-radius: 0.375rem; font-size: 0.875rem; color: #991b1b; font-weight: 500;">
+                            🚫 Blocked by: <strong style="color: #7f1d1d;">${task.blockedBy.join(', ')}</strong>
+                        </div>
+                    ` : ''}
+                    <div class="task-details">
+                        <div style="margin-top: 0.5rem;">
+                            <strong style="color: #475569;">Risk Factors:</strong>
+                            <ul style="margin-left: 1.5rem; color: #334155; margin-top: 0.25rem;">
+                                ${task.riskFactors.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <strong style="color: #475569;">Historical Reference:</strong>
+                            <p style="color: #334155; margin-top: 0.25rem;">${task.historicalReference}</p>
+                        </div>
+                        ${task.blocks && task.blocks.length > 0 ? `
+                            <div style="margin-top: 0.5rem;">
+                                <strong style="color: #475569;">Blocks:</strong>
+                                <p style="color: #334155; margin-top: 0.25rem;">${task.blocks.join(', ')}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTask(element) {
+            element.classList.toggle('expanded');
+        }
+
+        let currentView = 'list';
+
+        function filterTasks(status) {
+            currentFilter = status;
+
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Re-render tasks with current view
+            if (currentView === 'list') {
+                renderTasksList(status);
+            } else {
+                renderKanbanBoard(status);
+            }
+        }
+
+        function toggleView(view) {
+            currentView = view;
+
+            // Update button states
+            document.getElementById('viewToggleList').classList.toggle('active', view === 'list');
+            document.getElementById('viewToggleKanban').classList.toggle('active', view === 'kanban');
+
+            // Toggle containers
+            document.getElementById('tasksList').style.display = view === 'list' ? 'block' : 'none';
+            document.getElementById('kanbanBoard').style.display = view === 'kanban' ? 'block' : 'none';
+
+            // Render appropriate view
+            if (view === 'list') {
+                renderTasksList(currentFilter);
+            } else {
+                renderKanbanBoard(currentFilter);
+            }
+        }
+
+        function renderKanbanBoard(filterStatus = 'all') {
+            const container = document.getElementById('kanbanBoard');
+
+            // Define columns
+            const columns = [
+                { status: 'not_started', title: '○ To Do', color: '#64748b' },
+                { status: 'in_progress', title: '⏳ In Progress', color: '#f59e0b' },
+                { status: 'completed', title: '✓ Done', color: '#22c55e' }
+            ];
+
+            // Filter tasks based on current filter
+            let tasksToShow = data.tasks;
+            if (filterStatus !== 'all') {
+                tasksToShow = data.tasks.filter(t => t.status === filterStatus);
+            }
+
+            // Group tasks by status
+            const tasksByStatus = {
+                'not_started': tasksToShow.filter(t => t.status === 'not_started'),
+                'in_progress': tasksToShow.filter(t => t.status === 'in_progress'),
+                'completed': tasksToShow.filter(t => t.status === 'completed')
+            };
+
+            // Render kanban board
+            container.innerHTML = `
+                <div class="kanban-board">
+                    ${columns.map(column => {
+                        const tasks = tasksByStatus[column.status] || [];
+                        return `
+                            <div class="kanban-column">
+                                <div class="kanban-column-header">
+                                    <span style="color: ${column.color};">${column.title}</span>
+                                    <span class="kanban-column-count">${tasks.length}</span>
+                                </div>
+                                <div class="kanban-tasks">
+                                    ${tasks.map(task => `
+                                        <div class="kanban-task" onclick="toggleTask(document.querySelector('[data-task-id=\\'${task.id}\\']'))">
+                                            <div class="kanban-task-header">
+                                                <div class="kanban-task-title">${task.title}</div>
+                                                <div class="kanban-task-id">${task.id}</div>
+                                            </div>
+                                            <div class="kanban-task-meta">
+                                                ${getStatusBadge(task.status)}
+                                                <span style="background: ${getPriorityColor(task.priority)}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">${task.priority}</span>
+                                                ${task.storyPoints ? `<span style="background: #dbeafe; color: #1e40af; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">${task.storyPoints} pts</span>` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'P0': '#ef4444',
+                'P1': '#f97316',
+                'P2': '#eab308',
+                'P3': '#22c55e',
+                'P4': '#3b82f6'
+            };
+            return colors[priority] || '#64748b';
+        }
+
+        function searchTasks(query) {
+            const searchQuery = query.toLowerCase().trim();
+            const allTaskElements = document.querySelectorAll('.tasks-list .task-item');
+
+            allTaskElements.forEach(taskEl => {
+                const taskId = taskEl.getAttribute('data-task-id');
+                const task = data.tasks.find(t => t.id === taskId);
+
+                if (!task) return;
+
+                const searchableText = [
+                    task.title,
+                    task.description,
+                    task.priority,
+                    task.id,
+                    task.status
+                ].join(' ').toLowerCase();
+
+                if (searchableText.includes(searchQuery)) {
+                    taskEl.style.display = '';
+                } else {
+                    taskEl.style.display = 'none';
+                }
+            });
+
+            // Show count of visible tasks
+            const visibleCount = Array.from(allTaskElements).filter(el => el.style.display !== 'none').length;
+            const totalCount = allTaskElements.length;
+
+            // Update or create search results indicator
+            let indicator = document.getElementById('searchIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'searchIndicator';
+                indicator.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem; background: #f1f5f9; border-radius: 0.375rem; font-size: 0.875rem; color: #475569;';
+                document.getElementById('tasksList').insertAdjacentElement('beforebegin', indicator);
+            }
+
+            if (searchQuery) {
+                indicator.textContent = `Showing ${visibleCount} of ${totalCount} tasks`;
+                indicator.style.display = 'block';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+
+        function renderBlockersList() {
+            const container = document.getElementById('blockersList');
+            if (!data.currentBlockers || data.currentBlockers.length === 0) {
+                container.innerHTML = '<p style="color: #22c55e;">✅ No critical blockers! All tasks are on track.</p>';
+                return;
+            }
+
+            container.innerHTML = data.currentBlockers.map(blocker => `
+                <div class="blocker-alert">
+                    <h3>🚨 ${blocker.blockedTaskTitle} blocked by ${blocker.blockedByTitle}</h3>
+                    <p style="color: #1f2937; margin-top: 0.5rem;"><strong>Impact:</strong> ${blocker.impact}</p>
+                    <p style="color: #92400e; margin-top: 0.5rem;"><strong>Mitigation:</strong> ${blocker.mitigation}</p>
+                </div>
+            `).join('');
+        }
+
+        // Simple markdown to HTML converter for bold text
+        function parseMarkdown(text) {
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>');
+        }
+
+        function renderVelocityInsights() {
+            const container = document.getElementById('velocityInsights');
+            const insights = data.velocityInsights;
+
+            container.innerHTML = `
+                <div class="insight-box">
+                    <h3>🤖 AI Analysis</h3>
+                    <p style="color: #1e293b;">${parseMarkdown(insights.aiAnalysis)}</p>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <h3 style="color: #ef4444; margin-bottom: 0.5rem;">⚠️ Risks</h3>
+                    ${insights.risks.map(risk => `
+                        <div class="risk-item">
+                            <p style="color: #7f1d1d;">${parseMarkdown(risk)}</p>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <h3 style="color: #22c55e; margin-bottom: 0.5rem;">💡 Recommendations</h3>
+                    ${insights.recommendations.map(rec => `
+                        <div class="recommendation">
+                            <p style="color: #14532d;">${parseMarkdown(rec)}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderWeeklyAnalysis() {
+            const container = document.getElementById('weeklyAnalysisList');
+            if (!data.weeklyAnalysis) return;
+
+            container.innerHTML = data.weeklyAnalysis.map(week => `
+                <div class="weekly-summary">
+                    <h3>Week ${week.weekNumber}: ${week.dateRange} (${week.commits} commits)</h3>
+                    <p style="color: #1f2937; margin-bottom: 1rem;">${parseMarkdown(week.aiSummary)}</p>
+                    <strong style="color: #374151;">Key Accomplishments:</strong>
+                    <ul>
+                        ${week.keyAccomplishments.map(acc => `<li>${parseMarkdown(acc)}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function renderTimelineGantt() {
+            const completedSessions = data.completedWork || [];
+            const container = document.getElementById('timelineContent');
+
+            if (completedSessions.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No sessions recorded yet.</p>';
+                return;
+            }
+
+            container.innerHTML = completedSessions.map((session, index) => `
+                <div style="position: relative; padding-bottom: ${index === completedSessions.length - 1 ? '0' : '2rem'};">
+                    <!-- Timeline dot -->
+                    <div style="position: absolute; left: -2rem; width: 1rem; height: 1rem; background: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 2px #3b82f6;"></div>
+
+                    <!-- Vertical line -->
+                    ${index !== completedSessions.length - 1 ? '<div style="position: absolute; left: -1.5rem; top: 1rem; bottom: 0; width: 2px; background: #cbd5e1;"></div>' : ''}
+
+                    <!-- Session card -->
+                    <div style="background: white; border: 2px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem; margin-left: 0.5rem; transition: all 0.2s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                            <h3 style="color: #0f172a; margin: 0; font-size: 1.1rem;">${session.session}</h3>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <span style="background: #dbeafe; color: #1e40af; padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; font-weight: 600; border: 1px solid #3b82f6;">${session.commits} commit${session.commits !== 1 ? 's' : ''}</span>
+                                <span style="color: #64748b; font-size: 0.875rem;">📅 ${session.date}</span>
+                            </div>
+                        </div>
+                        <div style="color: #475569; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.5rem;">${session.summary}</div>
+                        <div style="color: #94a3b8; font-size: 0.85rem;">⏱️ ${session.duration}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDependencyGraph() {
+            const tasksWithDeps = data.tasks.filter(t => t.blockedBy && t.blockedBy.length > 0);
+            const container = document.getElementById('dependenciesContent');
+
+            if (tasksWithDeps.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">✅ No blocking dependencies! All tasks can proceed independently.</p>';
+                return;
+            }
+
+            // Create a map of task IDs to tasks for easy lookup
+            const taskMap = {};
+            data.tasks.forEach(t => taskMap[t.id] = t);
+
+            container.innerHTML = tasksWithDeps.map(task => {
+                const priorityColor = {
+                    'P0': { bg: '#fee2e2', border: '#dc2626' },
+                    'P1': { bg: '#ffedd5', border: '#ea580c' },
+                    'P2': { bg: '#fef3c7', border: '#d97706' },
+                    'P3': { bg: '#dcfce7', border: '#22c55e' }
+                }[task.priority] || { bg: '#f3f4f6', border: '#d1d5db' };
+
+                const blockers = task.blockedBy.map(blockerId => {
+                    const blocker = taskMap[blockerId];
+                    if (!blocker) return null;
+
+                    const blockerColor = {
+                        'P0': { bg: '#fee2e2', border: '#dc2626' },
+                        'P1': { bg: '#ffedd5', border: '#ea580c' },
+                        'P2': { bg: '#fef3c7', border: '#d97706' },
+                        'P3': { bg: '#dcfce7', border: '#22c55e' }
+                    }[blocker.priority] || { bg: '#f3f4f6', border: '#d1d5db' };
+
+                    return `
+                        <div style="background: ${blockerColor.bg}; border-left: 4px solid ${blockerColor.border}; padding: 0.75rem; border-radius: 0.375rem; margin-top: 0.5rem;">
+                            <div style="font-weight: 600; color: #0f172a; margin-bottom: 0.25rem;">
+                                ${blocker.priority} - ${blocker.title}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748b;">
+                                Status: ${blocker.status === 'completed' ? '✅ Done' : blocker.status === 'in_progress' ? '⏳ In Progress' : '○ Not Started'}
+                            </div>
+                        </div>
+                    `;
+                }).filter(Boolean).join('');
+
+                return `
+                    <div style="background: white; border: 2px solid ${priorityColor.border}; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="background: ${priorityColor.bg}; border-left: 4px solid ${priorityColor.border}; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1rem;">
+                            <div style="font-weight: 600; color: #0f172a; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                                ${task.priority} - ${task.title}
+                            </div>
+                            <div style="color: #475569; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                ${task.description}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748b;">
+                                ${task.id} | ${task.effort} effort | Status: ${task.status}
+                            </div>
+                        </div>
+
+                        <div style="padding-left: 1rem;">
+                            <div style="font-weight: 600; color: #ef4444; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.25rem;">🚫</span>
+                                Blocked By (${task.blockedBy.length})
+                            </div>
+                            ${blockers}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRoadmap() {
+            const container = document.getElementById('roadmapContent');
+            const releases = data.releases || [];
+            const projects = data.projects || [];
+
+            container.innerHTML = releases.map(release => {
+                const releaseProjects = projects.filter(p => release.projects.includes(p.id));
+
+                return `
+                    <div class="release-card" onclick="toggleRelease(event, '${release.id}')">
+                        <div class="release-header">
+                            <h3>
+                                ${release.name}
+                                <span class="release-expand-icon">▶</span>
+                            </h3>
+                            <div class="release-meta">
+                                <span class="release-status-badge release-status-${release.status}">
+                                    ${release.status.replace('_', ' ')}
+                                </span>
+                                <div class="release-progress">
+                                    <span>${release.percentComplete}% Complete</span>
+                                    ${release.targetDate ? `<span>📅 ${release.targetDate}</span>` : '<span>📅 TBD</span>'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="release-details" id="${release.id}-details">
+                            <p style="color: #475569; margin-bottom: 1rem; line-height: 1.6;">
+                                <strong>Theme:</strong> ${release.theme}<br>
+                                ${release.description}
+                            </p>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <h4 style="color: #0f172a; font-size: 1rem; margin-bottom: 0.5rem;">🎯 Key Features</h4>
+                                <ul style="margin-left: 1.5rem; color: #334155;">
+                                    ${release.keyFeatures.map(f => `<li>${f}</li>`).join('')}
+                                </ul>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <h4 style="color: #0f172a; font-size: 1rem; margin-bottom: 0.5rem;">📊 Projects (${releaseProjects.length})</h4>
+                                ${releaseProjects.map(project => `
+                                    <div class="project-card">
+                                        <h4>${project.name}</h4>
+                                        <p style="color: #475569; margin-bottom: 0.75rem;">${project.objective}</p>
+
+                                        <div class="project-meta">
+                                            <span class="badge" style="background: ${getPriorityColor(project.priority).bg}; color: ${getPriorityColor(project.priority).color}; border: 1px solid ${getPriorityColor(project.priority).border};">${project.priority}</span>
+                                            <span class="badge effort-${project.effort.toLowerCase()}">${project.effort} - ${project.estimatedDays} ${project.estimatedDays === 1 ? 'session' : 'sessions'}</span>
+                                            <span class="badge" style="background: ${getStatusColor(project.status).bg}; color: ${getStatusColor(project.status).color}; border: 1px solid ${getStatusColor(project.status).border};">${project.status.replace('_', ' ')}</span>
+                                        </div>
+
+                                        ${project.healthAnalysis ? `
+                                            <div style="background: #f8fafc; border-left: 3px solid #3b82f6; padding: 0.75rem; margin: 0.75rem 0; border-radius: 0.375rem;">
+                                                <strong style="color: #1e40af; font-size: 0.9rem;">🏥 Health Analysis:</strong>
+                                                <p style="color: #475569; margin: 0.5rem 0 0 0; font-size: 0.875rem; line-height: 1.5;">${project.healthAnalysis}</p>
+                                            </div>
+                                        ` : ''}
+
+                                        ${project.keyFeatures && project.keyFeatures.length > 0 ? `
+                                            <div class="project-features">
+                                                <strong style="color: #475569; font-size: 0.9rem;">Features:</strong>
+                                                <ul>
+                                                    ${project.keyFeatures.map(f => `<li>${f}</li>`).join('')}
+                                                </ul>
+                                            </div>
+                                        ` : ''}
+
+                                        ${project.risks && project.risks.length > 0 ? `
+                                            <div class="project-risks">
+                                                <strong style="color: #ef4444; font-size: 0.9rem;">⚠️ Risks:</strong>
+                                                ${project.risks.map(r => `
+                                                    <div style="background: #fef2f2; border-left: 3px solid #ef4444; padding: 0.5rem 0.75rem; margin-top: 0.5rem; border-radius: 0.375rem;">
+                                                        <p style="color: #7f1d1d; margin: 0; font-size: 0.875rem;">${r}</p>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+
+                                        ${project.dependencies && project.dependencies.length > 0 ? `
+                                            <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.75rem;">
+                                                <strong>Dependencies:</strong> ${project.dependencies.join(', ')}
+                                            </p>
+                                        ` : ''}
+
+                                        ${project.planningDoc ? `
+                                            <p style="color: #3b82f6; font-size: 0.875rem; margin-top: 0.5rem;">
+                                                📄 <a href="${project.planningDoc}" style="color: #3b82f6; text-decoration: underline;">View planning doc</a>
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            ${release.risks && release.risks.length > 0 ? `
+                                <div>
+                                    <h4 style="color: #ef4444; font-size: 1rem; margin-bottom: 0.5rem;">⚠️ Release Risks</h4>
+                                    ${release.risks.map(r => {
+                                        const riskText = typeof r === 'string' ? r : r.description;
+                                        const severity = r.severity || '';
+                                        const mitigation = r.mitigation || '';
+                                        const severityColor = severity === 'high' ? '#dc2626' : severity === 'medium' ? '#ea580c' : '#65a30d';
+                                        return `
+                                            <div style="background: #fef2f2; border-left: 3px solid #ef4444; padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 0.375rem;">
+                                                <p style="color: #7f1d1d; margin: 0; font-weight: 600;">${riskText}</p>
+                                                ${severity ? `<p style="color: ${severityColor}; margin: 0.25rem 0 0 0; font-size: 0.85rem;">Severity: ${severity}</p>` : ''}
+                                                ${mitigation ? `<p style="color: #475569; margin: 0.25rem 0 0 0; font-size: 0.85rem;"><strong>Mitigation:</strong> ${mitigation}</p>` : ''}
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDatabases() {
+            const databases = data.databases || [];
+
+            // Calculate summary stats
+            const integrated = databases.filter(db => db.status === 'integrated').length;
+            const staged = databases.filter(db => db.status === 'staged').length;
+            const notIntegrated = databases.filter(db => db.status === 'not_integrated').length;
+            const totalSize = databases.reduce((sum, db) => {
+                const size = parseFloat(db.size.replace(' MB', ''));
+                return sum + size;
+            }, 0).toFixed(2);
+
+            // Update summary cards
+            document.getElementById('dbIntegratedCount').textContent = integrated;
+            document.getElementById('dbStagedCount').textContent = staged;
+            document.getElementById('dbNotIntegratedCount').textContent = notIntegrated;
+            document.getElementById('dbTotalSize').textContent = `${totalSize} MB`;
+
+            // Render database list
+            const container = document.getElementById('databasesList');
+            container.innerHTML = databases.map(db => {
+                const statusConfig = {
+                    'integrated': { icon: '✅', color: '#10b981', bg: '#d1fae5', label: 'Integrated' },
+                    'staged': { icon: '⏳', color: '#f59e0b', bg: '#fef3c7', label: 'Staged' },
+                    'not_integrated': { icon: '○', color: '#64748b', bg: '#f1f5f9', label: 'Not Started' }
+                };
+                const config = statusConfig[db.status];
+
+                return `
+                    <div style="background: white; border: 2px solid ${config.color}20; border-left: 4px solid ${config.color}; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1rem; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                            <div style="flex: 1;">
+                                <h3 style="color: #0f172a; margin: 0 0 0.5rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.25rem;">${config.icon}</span>
+                                    ${db.name}
+                                </h3>
+                                <p style="color: #64748b; margin: 0; font-size: 0.9rem;">${db.description}</p>
+                            </div>
+                            <span style="background: ${config.bg}; color: ${config.color}; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; border: 1px solid ${config.color}; white-space: nowrap; margin-left: 1rem;">
+                                ${config.label}
+                            </span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Records</div>
+                                <div style="color: #1e293b; font-weight: 600; font-size: 0.95rem;">${db.records}</div>
+                            </div>
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Size</div>
+                                <div style="color: #1e293b; font-weight: 600; font-size: 0.95rem;">${db.size}</div>
+                            </div>
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Coverage</div>
+                                <div style="color: #1e293b; font-weight: 600; font-size: 0.95rem;">${db.coverage}</div>
+                            </div>
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Last Updated</div>
+                                <div style="color: #1e293b; font-weight: 600; font-size: 0.95rem;">${db.lastUpdated}</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+                            <div style="color: #64748b; font-size: 0.85rem;">
+                                <strong>File:</strong> <code style="background: #f1f5f9; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.8rem;">${db.filename}</code>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateHealthScore() {
+            // Calculate health score based on multiple factors
+            let score = 100;
+            let factors = [];
+
+            // Factor 1: Blockers (-20 points per blocker)
+            const blockers = (data.currentBlockers || []).length;
+            if (blockers > 0) {
+                const penalty = Math.min(blockers * 20, 40); // Max 40 points penalty
+                score -= penalty;
+                factors.push(`${blockers} blocker${blockers > 1 ? 's' : ''} (-${penalty})`);
+            } else {
+                factors.push('No blockers (+0)');
+            }
+
+            // Factor 2: Velocity trend (compare last 2 weeks)
+            const weeks = data.weeklyAnalysis || [];
+            if (weeks.length >= 2) {
+                const lastWeek = weeks[weeks.length - 1];
+                const prevWeek = weeks[weeks.length - 2];
+                const velocityChange = lastWeek.commits - prevWeek.commits;
+
+                if (velocityChange > 0) {
+                    score += 10; // Improving
+                    factors.push(`Velocity improving (+10)`);
+                } else if (velocityChange < 0) {
+                    score -= 10; // Declining
+                    factors.push(`Velocity declining (-10)`);
+                }
+            }
+
+            // Factor 3: Risks
+            const risks = (data.velocityInsights?.risks || []).length;
+            if (risks > 0) {
+                const penalty = Math.min(risks * 10, 20); // Max 20 points penalty
+                score -= penalty;
+                factors.push(`${risks} risk${risks > 1 ? 's' : ''} (-${penalty})`);
+            }
+
+            // Factor 4: On-track status (compare actual vs target)
+            const releases = data.releases || [];
+            const activeReleases = releases.filter(r => r.status === 'in_progress' || r.status === 'planning');
+            let behindCount = 0;
+
+            activeReleases.forEach(release => {
+                // If less than 50% complete but past midpoint, consider behind
+                const targetDate = new Date(release.targetDate);
+                const startDate = new Date(data.metadata.launchDate);
+                const now = new Date();
+                const totalDuration = targetDate - startDate;
+                const elapsed = now - startDate;
+                const expectedProgress = (elapsed / totalDuration) * 100;
+
+                if (release.percentComplete < expectedProgress - 20) {
+                    behindCount++;
+                }
+            });
+
+            if (behindCount > 0) {
+                const penalty = Math.min(behindCount * 15, 30);
+                score -= penalty;
+                factors.push(`${behindCount} release${behindCount > 1 ? 's' : ''} behind (-${penalty})`);
+            }
+
+            // Ensure score is between 0-100
+            score = Math.max(0, Math.min(100, score));
+
+            // Update UI
+            const scoreCard = document.getElementById('healthScoreCard');
+            const scoreIcon = document.getElementById('healthScoreIcon');
+            const scoreValue = document.getElementById('healthScore');
+            const scoreLabel = document.getElementById('healthScoreLabel');
+
+            scoreValue.textContent = Math.round(score);
+
+            if (score >= 80) {
+                scoreCard.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+                scoreCard.style.borderColor = '#10b981';
+                scoreIcon.innerHTML = '🟢 Project Health';
+                scoreIcon.style.color = '#065f46';
+                scoreValue.style.color = '#065f46';
+                scoreLabel.style.color = '#065f46';
+                scoreLabel.textContent = 'Healthy';
+            } else if (score >= 60) {
+                scoreCard.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+                scoreCard.style.borderColor = '#f59e0b';
+                scoreIcon.innerHTML = '🟡 Project Health';
+                scoreIcon.style.color = '#92400e';
+                scoreValue.style.color = '#92400e';
+                scoreLabel.style.color = '#92400e';
+                scoreLabel.textContent = 'Caution';
+            } else {
+                scoreCard.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+                scoreCard.style.borderColor = '#ef4444';
+                scoreIcon.innerHTML = '🔴 Project Health';
+                scoreIcon.style.color = '#991b1b';
+                scoreValue.style.color = '#991b1b';
+                scoreLabel.style.color = '#991b1b';
+                scoreLabel.textContent = 'At Risk';
+            }
+
+            // Add tooltip with factors
+            scoreCard.title = `Factors:\n${factors.join('\n')}`;
+
+            // Update health analysis with contextual explanation for THIS project
+            const healthAnalysisDiv = document.getElementById('healthAnalysisText');
+            // Use releases already declared above at line 1953
+            const currentRelease = releases.find(r => r.status === 'in_progress' || r.status === 'planned') || releases[releases.length - 1];
+
+            let analysisText = '';
+            if (score >= 80) {
+                analysisText = `<strong>R1-MVP shipped + Skills Framework complete!</strong> 8 sessions across 6 working days (Oct 12-17). Session 8 delivered 20 story points in <30 minutes - created 4 Claude Skills that replaced 18 points of Python scripting work. All critical features delivered: dashboard, burn-up charts, roadmap, session-based metrics. Zero blockers. Velocity: 5.8 points/session. R2-Automation reduced from 25 → 7 points (72% scope reduction). Ready to ship R2 in 1-2 sessions.`;
+            } else if (score >= 60) {
+                analysisText = `<strong>Caution:</strong> ${factors.join('. ')}. Current phase: ${data.metadata.projectPhase}. Review blockers and velocity trends to get back on track.`;
+            } else {
+                analysisText = `<strong>At Risk:</strong> ${factors.join('. ')}. Immediate action needed. Current phase: ${data.metadata.projectPhase}. Address blockers and review project scope.`;
+            }
+
+            healthAnalysisDiv.innerHTML = analysisText;
+        }
+
+        function renderCommitHeatmap() {
+            const container = document.getElementById('commitHeatmap');
+            const burnUpData = data.burnUpData?.dataPoints || [];
+
+            console.log('Commit heatmap - burnUpData length:', burnUpData.length);
+            console.log('Commit heatmap - first dataPoint:', burnUpData[0]);
+
+            if (burnUpData.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No commit data available</p>';
+                return;
+            }
+
+            // Create a map of dates to commits
+            const commitsByDate = {};
+            for (let i = 1; i < burnUpData.length; i++) {
+                const point = burnUpData[i];
+                const prevPoint = burnUpData[i - 1];
+                const commits = point.cumulativeCommits - prevPoint.cumulativeCommits;
+                commitsByDate[point.date] = commits;
+            }
+
+            // Get date range (last 90 days or all data)
+            const endDate = new Date();
+            const startDate = new Date(data.metadata.launchDate);
+            const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const daysToShow = Math.min(daysDiff, 90);
+
+            // Generate grid
+            const weeks = Math.ceil(daysToShow / 7);
+            const currentDate = new Date(endDate);
+            currentDate.setDate(currentDate.getDate() - daysToShow);
+
+            // Calculate max commits for color scaling
+            const maxCommits = Math.max(...Object.values(commitsByDate), 1);
+
+            // Build heatmap HTML
+            const colors = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+            let html = '<div style="display: flex; gap: 0.125rem; justify-content: start;">';
+
+            for (let week = 0; week < weeks; week++) {
+                html += '<div style="display: flex; flex-direction: column; gap: 0.125rem;">';
+
+                for (let day = 0; day < 7; day++) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    const commits = commitsByDate[dateStr] || 0;
+                    const intensity = commits === 0 ? 0 : Math.min(Math.ceil((commits / maxCommits) * 4), 4);
+                    const color = colors[intensity];
+
+                    html += `
+                        <div style="width: 12px; height: 12px; background: ${color}; border-radius: 2px; cursor: pointer;"
+                             title="${dateStr}: ${commits} commit${commits !== 1 ? 's' : ''}">
+                        </div>
+                    `;
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            // Add legend
+            html += `
+                <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #64748b;">
+                    <span>Less</span>
+                    ${colors.map(c => `<div style="width: 12px; height: 12px; background: ${c}; border-radius: 2px;"></div>`).join('')}
+                    <span>More</span>
+                    <span style="margin-left: 1rem;">Max: ${maxCommits} commits/day</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderEffortAccuracy() {
+            const container = document.getElementById('effortAccuracy');
+            const tasks = data.tasks?.filter(t => t.status === 'completed') || [];
+
+            if (tasks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">No completed tasks to analyze</p>';
+                return;
+            }
+
+            // ACTUAL VELOCITY METRICS
+            const totalStoryPoints = data.metadata.velocity.totalStoryPoints || 0;
+            const totalSessions = data.historicalFeatures?.length || 1;
+            const actualWorkingDays = data.metadata.velocity.workingDaysTracked || 1;
+
+            // Real velocity
+            const velocityPerDay = totalStoryPoints / actualWorkingDays;
+            const velocityPerSession = totalStoryPoints / totalSessions;
+
+            // Group by effort size for actual delivery analysis
+            const effortSizes = ['XS', 'S', 'M', 'L', 'XL'];
+            const effortAnalysis = {};
+
+            effortSizes.forEach(size => {
+                const sizeTasks = tasks.filter(t => t.effort === size);
+                if (sizeTasks.length === 0) return;
+
+                const totalStoryPts = sizeTasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+                const avgStoryPoints = totalStoryPts / sizeTasks.length;
+
+                effortAnalysis[size] = {
+                    count: sizeTasks.length,
+                    totalStoryPoints: totalStoryPts,
+                    avgStoryPoints: avgStoryPoints.toFixed(1)
+                };
+            });
+
+            // Display actual velocity metrics
+            const bgGradient = 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)';
+            const borderColor = '#3b82f6';
+            const textColor = '#1e40af';
+            const headingColor = '#1e3a8a';
+
+            // Render HTML - Actual Velocity
+            let html = `
+                <div style="background: ${bgGradient}; border-left: 4px solid ${borderColor}; padding: 1.25rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: ${textColor}; margin: 0 0 0.75rem 0; font-size: 1.1rem;">📊 Actual Velocity</h3>
+                    <div style="color: ${headingColor}; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">${velocityPerDay.toFixed(1)} pts/day</div>
+                    <div style="color: ${textColor}; font-size: 0.9rem; line-height: 1.6;">
+                        <strong>Total Delivered:</strong> ${totalStoryPoints} story points<br>
+                        <strong>Working Days:</strong> ${actualWorkingDays} days<br>
+                        <strong>Sessions:</strong> ${totalSessions} sessions (${velocityPerSession.toFixed(1)} pts/session)<br>
+                        <br>
+                        <strong>Reality:</strong> Delivered ${totalStoryPoints} story points across ${totalSessions} development sessions in ${actualWorkingDays} working days.
+                    </div>
+                </div>
+
+                <div style="display: grid; gap: 1rem;">
+            `;
+
+            Object.entries(effortAnalysis).forEach(([size, effortData]) => {
+                // Get story points range for this size
+                const storyPointsRange = window.backlogData?.effortSizes?.[size]?.storyPoints || '';
+                const storyPointsLabel = storyPointsRange ? ` (${storyPointsRange} points)` : '';
+
+                const sizeStoryPoints = parseFloat(effortData.avgStoryPoints);
+                const sizeTotalPoints = effortData.totalStoryPoints;
+                const percentOfTotal = ((sizeTotalPoints / totalStoryPoints) * 100).toFixed(0);
+
+                html += `
+                    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                            <div>
+                                <h4 style="color: #0f172a; margin: 0; font-size: 1rem;">${size} Tasks${storyPointsLabel}</h4>
+                                <div style="color: #64748b; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    ${effortData.count} completed • ${sizeTotalPoints} total points
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">${sizeStoryPoints}</div>
+                                <div style="color: #64748b; font-size: 0.85rem;">Avg points</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f1f5f9; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: #3b82f6; height: 100%; width: ${percentOfTotal}%;"></div>
+                        </div>
+                        <div style="color: #64748b; font-size: 0.75rem; margin-top: 0.25rem;">${percentOfTotal}% of total work</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+
+                <div style="background: #f8fafc; border-radius: 0.75rem; padding: 1.25rem; margin-top: 1.5rem;">
+                    <h4 style="color: #0f172a; margin: 0 0 0.75rem 0; font-size: 1rem;">📋 Story Points by Effort Size</h4>
+                    <div style="color: #475569; font-size: 0.9rem; line-height: 1.6;">
+                        <ul style="margin: 0; padding-left: 1.5rem;">
+                            <li><strong>XS tasks (1-2 pts):</strong> ${effortAnalysis['XS'] ? effortAnalysis['XS'].count + ' tasks, ' + effortAnalysis['XS'].totalStoryPoints + ' points total' : 'No data'}</li>
+                            <li><strong>S tasks (3-5 pts):</strong> ${effortAnalysis['S'] ? effortAnalysis['S'].count + ' tasks, ' + effortAnalysis['S'].totalStoryPoints + ' points total' : 'No data'}</li>
+                            <li><strong>M tasks (5-8 pts):</strong> ${effortAnalysis['M'] ? effortAnalysis['M'].count + ' tasks, ' + effortAnalysis['M'].totalStoryPoints + ' points total' : 'No data'}</li>
+                            <li><strong>L tasks (8-13 pts):</strong> ${effortAnalysis['L'] ? effortAnalysis['L'].count + ' tasks, ' + effortAnalysis['L'].totalStoryPoints + ' points total' : 'No data'}</li>
+                            <li><strong>XL tasks (13+ pts):</strong> ${effortAnalysis['XL'] ? effortAnalysis['XL'].count + ' tasks, ' + effortAnalysis['XL'].totalStoryPoints + ' points total' : 'No data'}</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function showHealthInfo() {
+            const modal = document.getElementById('healthInfoModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeHealthInfo() {
+            const modal = document.getElementById('healthInfoModal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('healthInfoModal');
+            if (event.target === modal) {
+                closeHealthInfo();
+            }
+        });
+
+        function toggleRelease(event, releaseId) {
+            // Prevent toggle if clicking on a link
+            if (event.target.tagName === 'A') return;
+
+            const card = event.currentTarget;
+            card.classList.toggle('expanded');
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'P0': { bg: '#fee2e2', color: '#991b1b', border: '#ef4444' },
+                'P1': { bg: '#ffedd5', color: '#9a3412', border: '#f97316' },
+                'P2': { bg: '#fef3c7', color: '#92400e', border: '#eab308' },
+                'P3': { bg: '#dcfce7', color: '#166534', border: '#22c55e' },
+                'P4': { bg: '#dbeafe', color: '#1e40af', border: '#3b82f6' }
+            };
+            return colors[priority] || colors['P3'];
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'in_progress': { bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+                'not_started': { bg: '#f3f4f6', color: '#4b5563', border: '#d1d5db' },
+                'completed': { bg: '#d1fae5', color: '#065f46', border: '#10b981' },
+                'planned': { bg: '#dbeafe', color: '#1e40af', border: '#3b82f6' },
+                'backlog': { bg: '#f3f4f6', color: '#6b7280', border: '#d1d5db' }
+            };
+            return colors[status] || colors['not_started'];
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Export Reports Functionality
+        document.getElementById('exportReportsBtn').addEventListener('click', function() {
+            const formats = ['markdown', 'csv', 'json'];
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 1.5rem; color: #0f172a; font-size: 1.5rem;">Export Reports</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button onclick="exportReport('html')" style="padding: 1rem; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6; border-radius: 0.5rem; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 1rem; width: 100%;">
+                            <strong style="color: #1e40af;">📄 CEO Status Report (HTML)</strong><br>
+                            <span style="color: #1e40af; font-size: 0.875rem;">Executive summary with dual metrics - open and press Ctrl+P to save as PDF</span>
+                        </button>
+                        <button onclick="exportReport('markdown')" style="padding: 1rem; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 1rem;">
+                            <strong style="color: #0f172a;">📝 Markdown Report</strong><br>
+                            <span style="color: #64748b; font-size: 0.875rem;">Weekly status in Markdown format</span>
+                        </button>
+                        <button onclick="exportReport('csv')" style="padding: 1rem; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 1rem;">
+                            <strong style="color: #0f172a;">📊 CSV Export</strong><br>
+                            <span style="color: #64748b; font-size: 0.875rem;">Task list for spreadsheets</span>
+                        </button>
+                        <button onclick="exportReport('json')" style="padding: 1rem; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 1rem;">
+                            <strong style="color: #0f172a;">🔧 JSON Data</strong><br>
+                            <span style="color: #64748b; font-size: 0.875rem;">Raw data for automation</span>
+                        </button>
+                        <button onclick="exportReport('roadmap')" style="padding: 1rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0284c7; border-radius: 0.5rem; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 1rem; width: 100%;">
+                            <strong style="color: #0c4a6e;">🗺️ Product Roadmap (HTML)</strong><br>
+                            <span style="color: #0c4a6e; font-size: 0.875rem;">Complete roadmap with all releases and projects - open and press Ctrl+P to save as PDF</span>
+                        </button>
+                    </div>
+                    <button onclick="document.querySelector('[style*=\\'position: fixed\\']').remove()" style="margin-top: 1.5rem; width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; color: #64748b;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        });
+
+        function exportReport(format) {
+            const timestamp = new Date().toISOString().split('T')[0];
+            let content, filename, mimeType;
+
+            if (format === 'html') {
+                content = generateHTMLReport();
+                filename = `ceo-status-report-${timestamp}.html`;
+                mimeType = 'text/html';
+            } else if (format === 'markdown') {
+                content = generateMarkdownReport();
+                filename = `backlog-report-${timestamp}.md`;
+                mimeType = 'text/markdown';
+            } else if (format === 'csv') {
+                content = generateCSVReport();
+                filename = `backlog-tasks-${timestamp}.csv`;
+                mimeType = 'text/csv';
+            } else if (format === 'json') {
+                content = JSON.stringify(data, null, 2);
+                filename = `backlog-data-${timestamp}.json`;
+                mimeType = 'application/json';
+            } else if (format === 'roadmap') {
+                content = generateRoadmapHTML();
+                filename = `product-roadmap-${timestamp}.html`;
+                mimeType = 'text/html';
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            document.querySelector('[style*="position: fixed"]').remove();
+        }
+
+        function generateMarkdownReport() {
+            const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let md = `# Project Status Report\n\n`;
+            md += `**Date:** ${date}\n`;
+            md += `**Project:** ${data.metadata.projectName}\n`;
+            md += `**Status:** ${data.metadata.currentStatus}\n`;
+            md += `**Phase:** ${data.metadata.projectPhase}\n`;
+            md += `**Launch Date:** ${data.metadata.launchDate}\n\n`;
+
+            md += `## Executive Summary\n\n`;
+
+            // Add latest weekly analysis if available
+            if (data.weeklyAnalysis && data.weeklyAnalysis.length > 0) {
+                const latestWeek = data.weeklyAnalysis[data.weeklyAnalysis.length - 1];
+                md += `### ${latestWeek.dateRange} (${latestWeek.commits} commits)\n\n`;
+                md += `${latestWeek.aiSummary}\n\n`;
+            }
+
+            // Add velocity insights AI analysis
+            if (data.velocityInsights && data.velocityInsights.aiAnalysis) {
+                md += `### AI Analysis\n\n`;
+                md += `${data.velocityInsights.aiAnalysis}\n\n`;
+            }
+
+            md += `## Progress Summary\n\n`;
+            md += `- **Velocity:** ${data.metadata.velocity.avgStoryPointsPerDay} story points/day\n`;
+            md += `- **Total Commits:** ${data.metadata.velocity.totalCommits}\n`;
+            md += `- **Completion:** ${data.burnUpData.percentComplete.toFixed(1)}% (${data.burnUpData.completedScope}/${data.burnUpData.totalScope} story points)\n`;
+            md += `- **Tasks Complete:** ${data.mvpScope.tasksComplete}/${data.mvpScope.tasksTotal}\n\n`;
+
+            md += `## Priority Breakdown\n\n`;
+            ['P0', 'P1', 'P2'].forEach(priority => {
+                const tasks = data.tasks.filter(t => t.priority === priority);
+                if (tasks.length > 0) {
+                    md += `### ${priority} Tasks (${tasks.length})\n\n`;
+                    tasks.forEach(task => {
+                        md += `- **${task.id}**: ${task.title}\n`;
+                        md += `  - Effort: ${task.effort} (${task.effortDays} days, ${task.estimatedCommits} commits)\n`;
+                        md += `  - Status: ${task.status}\n`;
+                        if (task.blockedBy && task.blockedBy.length > 0) {
+                            md += `  - ⚠️ Blocked by: ${task.blockedBy.join(', ')}\n`;
+                        }
+                        md += `\n`;
+                    });
+                }
+            });
+
+            if (data.currentBlockers && data.currentBlockers.length > 0) {
+                md += `## 🚨 Current Blockers\n\n`;
+                data.currentBlockers.forEach(blocker => {
+                    md += `- **${blocker.blockedTask}** (${blocker.blockedTaskTitle}) blocked by **${blocker.blockedBy}**\n`;
+                    md += `  - ${blocker.impact}\n`;
+                    md += `  - Mitigation: ${blocker.mitigation}\n\n`;
+                });
+            }
+
+            if (data.velocityInsights) {
+                md += `## 📊 Velocity Insights\n\n`;
+                md += `${data.velocityInsights.aiAnalysis}\n\n`;
+
+                if (data.velocityInsights.risks && data.velocityInsights.risks.length > 0) {
+                    md += `### Risks\n\n`;
+                    data.velocityInsights.risks.forEach(risk => {
+                        md += `- ${risk}\n`;
+                    });
+                    md += `\n`;
+                }
+
+                if (data.velocityInsights.recommendations && data.velocityInsights.recommendations.length > 0) {
+                    md += `### Recommendations\n\n`;
+                    data.velocityInsights.recommendations.forEach(rec => {
+                        md += `- ${rec}\n`;
+                    });
+                    md += `\n`;
+                }
+            }
+
+            md += `---\n\n*Generated by Backlog Dashboard on ${date}*\n`;
+            return md;
+        }
+
+        function generateCSVReport() {
+            let csv = 'ID,Title,Priority,Effort,Effort Days,Estimated Commits,Risk,Status,Start Date,Target Date,Blocked By,Blocks\n';
+
+            data.tasks.forEach(task => {
+                csv += `"${task.id}","${task.title}","${task.priority}","${task.effort}",${task.effortDays},${task.estimatedCommits},"${task.risk}","${task.status}","${task.startDate || ''}","${task.targetDate || ''}","${(task.blockedBy || []).join('; ')}","${(task.blocks || []).join('; ')}"\n`;
+            });
+
+            return csv;
+        }
+
+        function generateHTMLReport() {
+            const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const mvpScope = data.mvpScope || {};
+            const p0Tasks = data.tasks.filter(t => t.priority === 'P0');
+
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${data.metadata.projectName} - Status Report</title>
+    <style>
+        @media print {
+            body { margin: 0.5in; }
+            .page-break { page-break-after: always; }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        h1 { color: #0f172a; border-bottom: 3px solid #3b82f6; padding-bottom: 0.5rem; }
+        h2 { color: #1e293b; margin-top: 1.5rem; border-left: 4px solid #60a5fa; padding-left: 0.5rem; }
+        h3 { color: #334155; margin-top: 1rem; }
+        .meta { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .meta strong { color: #3b82f6; }
+        .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .metric-card { background: white; border: 2px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; }
+        .metric-card .label { color: #64748b; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+        .metric-card .value { color: #0f172a; font-size: 2rem; font-weight: 700; margin: 0.5rem 0; }
+        .metric-card .desc { color: #64748b; font-size: 0.85rem; }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-weight: 600; font-size: 0.9rem; }
+        .status-green { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .status-yellow { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .task-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .task-table th { background: #e2e8f0; padding: 0.75rem; text-align: left; border: 1px solid #cbd5e1; }
+        .task-table td { padding: 0.5rem; border: 1px solid #cbd5e1; }
+        .priority-p0 { background: #fee2e2; }
+        .recommendation-box { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 1rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <h1>📊 ${data.metadata.projectName} - Status Report</h1>
+
+    <div class="meta">
+        <strong>Report Date:</strong> ${date}<br>
+        <strong>Project Status:</strong> ${data.metadata.currentStatus}<br>
+        <strong>Project Phase:</strong> ${data.metadata.projectPhase}<br>
+        <strong>Launch Date:</strong> ${data.metadata.launchDate}<br>
+        <strong>Current Session:</strong> ${data.metadata.velocity.currentSprint || 'Session-based development'}
+    </div>
+
+    <h2>Executive Summary</h2>
+
+    ${data.weeklyAnalysis && data.weeklyAnalysis.length > 0 ? (() => {
+        const latestWeek = data.weeklyAnalysis[data.weeklyAnalysis.length - 1];
+        return `
+        <h3>${latestWeek.dateRange} (${latestWeek.commits} commits)</h3>
+        <p style="margin-bottom: 1rem;">${latestWeek.aiSummary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>
+        `;
+    })() : ''}
+
+    <h2>Metrics</h2>
+
+    <div class="metrics">
+        <div class="metric-card">
+            <div class="label">User Ready</div>
+            <div class="value">${mvpScope.userReadyPercent.toFixed(1)}%</div>
+            <div class="desc">Can users complete the 7-step workflow?</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Tasks Complete</div>
+            <div class="value">${mvpScope.percentComplete.toFixed(1)}%</div>
+            <div class="desc">${mvpScope.tasksComplete} of ${mvpScope.tasksTotal} MVP features shipped</div>
+        </div>
+    </div>
+
+    <p><strong>Velocity:</strong> ${data.metadata.velocity.avgStoryPointsPerDay.toFixed(1)} story points/day average (${data.metadata.velocity.totalStoryPoints} total story points over ${data.metadata.velocity.workingDaysTracked} working days)</p>
+
+    <h2>📋 P0 Tasks (Launch Blockers)</h2>
+    <table class="task-table">
+    <thead><tr><th>ID</th><th>Title</th><th>Effort</th><th>Risk</th><th>Status</th></tr></thead>
+    <tbody>
+    ${p0Tasks.map(task => `
+        <tr class="priority-p0">
+            <td>${task.id}</td>
+            <td>${task.title}</td>
+            <td>${task.effort} (${task.effortDays}d)</td>
+            <td>${task.risk}</td>
+            <td>${task.status === 'completed' ? '✅ completed' : task.status === 'in_progress' ? '🔄 in_progress' : task.status === 'cancelled' ? '❌ rejected' : '⏳ not_started'}</td>
+        </tr>
+    `).join('')}
+    </tbody></table>
+
+    <h2>💡 Recommendations</h2>
+    ${data.velocityInsights.recommendations.map(rec => `
+        <div class="recommendation-box">${rec.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>')}</div>
+    `).join('')}
+
+    <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #cbd5e1; color: #64748b; font-size: 0.9rem;">
+        <p>Generated: ${date}</p>
+        <p>${data.metadata.projectName} - Internal Status Report</p>
+        <p style="margin-top: 0.5rem;">© 2025 Bert Carroll. Learn more about human-AI collaboration at <a href="https://askthehuman.com" style="color: #3b82f6;">askthehuman.com</a></p>
+    </footer>
+</body>
+</html>`;
+        }
+
+        function generateRoadmapHTML() {
+            const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const releases = data.releases || [];
+            const projects = data.projects || [];
+
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${data.metadata.projectName} - Product Roadmap</title>
+    <style>
+        @media print {
+            body { margin: 0.5in; }
+            .page-break { page-break-after: always; }
+            .release { page-break-inside: avoid; }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        h1 { color: #0f172a; border-bottom: 3px solid #3b82f6; padding-bottom: 0.5rem; }
+        h2 { color: #1e293b; margin-top: 1.5rem; border-left: 4px solid #60a5fa; padding-left: 0.5rem; }
+        h3 { color: #334155; margin-top: 1rem; }
+        .meta { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .meta strong { color: #3b82f6; }
+        .release { background: white; border: 2px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .release-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .release-status { padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; }
+        .status-in_progress { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .status-planned { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+        .status-backlog { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
+        .project { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; }
+        .project h4 { color: #0f172a; margin: 0 0 0.5rem 0; }
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.85rem; font-weight: 600; margin-right: 0.5rem; }
+        .risk-box { background: #fef2f2; border-left: 3px solid #ef4444; padding: 0.75rem; margin: 0.5rem 0; border-radius: 0.375rem; }
+        ul { margin-left: 1.5rem; }
+    </style>
+</head>
+<body>
+    <h1>🗺️ ${data.metadata.projectName} - Product Roadmap</h1>
+
+    <div class="meta">
+        <strong>Report Date:</strong> ${date}<br>
+        <strong>Project:</strong> ${data.metadata.projectName}<br>
+        <strong>Total Releases:</strong> ${releases.length}<br>
+        <strong>Total Projects:</strong> ${projects.length}
+    </div>
+
+    ${releases.map(release => {
+        const releaseProjects = projects.filter(p => release.projects.includes(p.id));
+        return `
+            <div class="release">
+                <div class="release-header">
+                    <h2>${release.name}</h2>
+                    <span class="release-status status-${release.status}">${release.status.replace('_', ' ')}</span>
+                </div>
+
+                <p><strong>Theme:</strong> ${release.theme}</p>
+                <p><strong>Target Date:</strong> ${release.targetDate || 'TBD'}</p>
+                <p><strong>Progress:</strong> ${release.percentComplete}% Complete (${release.completedStoryPoints || release.completedCommits}/${release.totalStoryPoints || release.totalCommits} story points)</p>
+                <p>${release.description}</p>
+
+                <h3>🎯 Key Features</h3>
+                <ul>
+                    ${release.keyFeatures.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+
+                <h3>📊 Projects (${releaseProjects.length})</h3>
+                ${releaseProjects.map(project => `
+                    <div class="project">
+                        <h4>${project.name}</h4>
+                        <p><strong>Objective:</strong> ${project.objective}</p>
+                        <p>
+                            <span class="badge" style="background: #fee2e2; color: #991b1b;">${project.priority}</span>
+                            <span class="badge" style="background: #fef3c7; color: #92400e;">${project.effort} - ${project.estimatedDays} days</span>
+                            <span class="badge" style="background: #dbeafe; color: #1e40af;">${project.estimatedCommits} commits</span>
+                            <span class="badge" style="background: #f3f4f6; color: #4b5563;">${project.status.replace('_', ' ')}</span>
+                        </p>
+
+                        ${project.keyFeatures && project.keyFeatures.length > 0 ? `
+                            <p><strong>Features:</strong></p>
+                            <ul>
+                                ${project.keyFeatures.map(f => `<li>${f}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+
+                        ${project.risks && project.risks.length > 0 ? `
+                            <p><strong>⚠️ Risks:</strong></p>
+                            ${project.risks.map(r => `<div class="risk-box">${r}</div>`).join('')}
+                        ` : ''}
+
+                        ${project.dependencies && project.dependencies.length > 0 ? `
+                            <p><strong>Dependencies:</strong> ${project.dependencies.join(', ')}</p>
+                        ` : ''}
+
+                        ${project.successMetrics && project.successMetrics.length > 0 ? `
+                            <p><strong>Success Metrics:</strong></p>
+                            <ul>
+                                ${project.successMetrics.map(m => `<li>${m}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                `).join('')}
+
+                ${release.risks && release.risks.length > 0 ? `
+                    <h3>⚠️ Release Risks</h3>
+                    ${release.risks.map(r => `<div class="risk-box">${r}</div>`).join('')}
+                ` : ''}
+            </div>
+        `;
+    }).join('')}
+
+    <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #cbd5e1; color: #64748b; font-size: 0.9rem;">
+        <p>Generated: ${date}</p>
+        <p>${data.metadata.projectName} - Product Roadmap</p>
+        <p style="margin-top: 0.5rem;">© 2025 Bert Carroll. Learn more about human-AI collaboration at <a href="https://askthehuman.com" style="color: #3b82f6;">askthehuman.com</a></p>
+    </footer>
+</body>
+</html>`;
+        }
+    </script>
+</body>
+</html>

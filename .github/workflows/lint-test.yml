@@ -1,0 +1,112 @@
+# Template: CI/CD Lint and Test Workflow
+# Runs on every push and pull request to master/main
+
+name: Lint, Test, and Security Scan
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Black (code formatting check)
+      run: |
+        cd backend
+        black --check --diff .
+
+    - name: Run isort (import sorting check)
+      run: |
+        cd backend
+        isort --check-only --diff .
+
+    - name: Run flake8 (linting)
+      run: |
+        cd backend
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+    - name: Run mypy (type checking)
+      run: |
+        cd backend
+        mypy apps --ignore-missing-imports --no-strict-optional
+      continue-on-error: true  # Don't fail build on type errors yet
+
+    - name: Run bandit (security linting)
+      run: |
+        cd backend
+        bandit -r apps -c ../pyproject.toml -f json -o bandit-report.json
+        bandit -r apps -c ../pyproject.toml
+
+    - name: Run pip-audit (dependency vulnerability scan)
+      run: |
+        cd backend
+        pip-audit --desc --fix-dry-run
+      continue-on-error: true  # Don't fail on vulnerabilities yet, just report
+
+    - name: Run Django tests
+      env:
+        DATABASE_URL: sqlite:///db.sqlite3
+        SECRET_KEY: test-secret-key-for-ci-only
+        DEBUG: 'False'
+      run: |
+        cd backend
+        python manage.py test --no-input
+
+    - name: Generate coverage report
+      env:
+        DATABASE_URL: sqlite:///db.sqlite3
+        SECRET_KEY: test-secret-key-for-ci-only
+        DEBUG: 'False'
+      run: |
+        cd backend
+        pytest --cov=apps --cov-report=xml --cov-report=term
+      continue-on-error: true  # Don't fail if tests don't exist yet
+
+    - name: Upload coverage to artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: backend/coverage.xml
+        retention-days: 30
+
+    - name: Upload bandit report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: bandit-report
+        path: backend/bandit-report.json
+        retention-days: 30
+
+# Customization Guide:
+# 1. Update 'backend/' paths if your structure is different
+# 2. Add Node.js/Frontend linting steps if needed
+# 3. Configure codecov.io or similar for coverage tracking
+# 4. Adjust flake8 rules in pyproject.toml
+# 5. Set up Slack/Discord notifications if desired
