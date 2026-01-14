@@ -1,8 +1,8 @@
 # ADR-0005: Pre-Merge Audit Protocol
 
 **Status:** Accepted
-**Date:** [DATE]
-**Authors:** [AUTHOR], Claude Code
+**Date:** 2026-01-14
+**Authors:** Bert Carroll, Claude Code
 **Priority:** High - Security and quality assurance
 
 ---
@@ -134,5 +134,5 @@ Every merge commit message MUST include this audit summary:
 
 ---
 
-**Author:** [AUTHOR]
-**Last Updated:** [DATE]
+**Author:** Bert Carroll
+**Last Updated:** 2026-01-14

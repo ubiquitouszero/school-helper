@@ -1,8 +1,8 @@
 # ADR-0007: Root Cause Analysis (RCA) Protocol
 
 **Status:** Accepted
-**Date:** [DATE]
-**Authors:** [AUTHOR], Claude Code
+**Date:** 2026-01-14
+**Authors:** Bert Carroll, Claude Code
 **Priority:** Medium - Process improvement for incident response
 
 ---
@@ -171,5 +171,5 @@ Production incidents are inevitable. When they occur, the team needs a systemati
 
 ---
 
-**Author:** [AUTHOR]
-**Last Updated:** [DATE]
+**Author:** Bert Carroll
+**Last Updated:** 2026-01-14

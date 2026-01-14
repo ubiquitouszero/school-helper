@@ -1,8 +1,8 @@
 # ADR-0003: Story Points-Based Velocity Tracking
 
 **Status:** Accepted
-**Date:** [DATE]
-**Authors:** [AUTHOR], Claude Code
+**Date:** 2026-01-14
+**Authors:** Bert Carroll, Claude Code
 **Priority:** P1 (High)
 **Related:** ADR-0001 (Claude Code AI Collaboration)
 
@@ -148,5 +148,5 @@ Average = (Complexity + Scope + Uncertainty + Risk) / 4
 
 ---
 
-**Author:** [AUTHOR]
-**Last Updated:** [DATE]
+**Author:** Bert Carroll
+**Last Updated:** 2026-01-14

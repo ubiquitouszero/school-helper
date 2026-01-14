@@ -5,7 +5,7 @@ decision-makers: Bert Carroll
 consulted: Claude (Sr. Dev Review)
 ---
 
-# ADR-0023: Mobile Claude Code Integration Workflow
+# ADR-0004: Mobile Claude Code Integration Workflow
 
 ## Context and Problem Statement
 

@@ -1,8 +1,8 @@
 # ADR-0006: Development Environment and CI/CD Pipeline
 
 **Status:** Accepted
-**Date:** [DATE]
-**Authors:** [AUTHOR], Claude Code
+**Date:** 2026-01-14
+**Authors:** Bert Carroll, Claude Code
 **Priority:** High - Prevents production incidents
 
 ---
@@ -130,5 +130,5 @@ Deploying directly from local development to production without an intermediate 
 
 ---
 
-**Author:** [AUTHOR]
-**Last Updated:** [DATE]
+**Author:** Bert Carroll
+**Last Updated:** 2026-01-14
