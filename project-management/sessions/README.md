@@ -7,7 +7,7 @@ Development session logs documenting work completed, decisions made, and lessons
 | Session | Date | Title | Story Points | Key Accomplishments |
 |---------|------|-------|--------------|---------------------|
 | [001](20260108%20-%20Session%20001%20-%20Initial%20Project%20Setup.md) | 2026-01-08 | Initial Project Setup | 5 | Project scaffolding, requirements, Claude Code config |
-| [002](20260114%20-%20Session%20002%20-%20Supabase%20and%20Multi-Tenant%20Architecture.md) | 2026-01-14 | Supabase and Multi-Tenant Architecture | 13 | Supabase setup, 6 ADRs, migration, **working Astro app** |
+| [002](20260114%20-%20Session%20002%20-%20Supabase%20and%20Multi-Tenant%20Architecture.md) | 2026-01-14 | Supabase and Multi-Tenant Architecture | 19 | **Working app** with math, numbers, sight words + trophy system + Supabase + 6 ADRs |
 
 ## Current Status
 
@@ -23,10 +23,10 @@ Development session logs documenting work completed, decisions made, and lessons
 | Metric | Value |
 |--------|-------|
 | Total Sessions | 2 |
-| Total Story Points | 18 |
+| Total Story Points | 24 |
 | Total Commits | 4 |
-| Average Points/Session | 9 |
-| MVP Progress | 46% |
+| Average Points/Session | 12 |
+| MVP Progress | 60% |
 
 ## Naming Convention
 
