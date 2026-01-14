@@ -4,3 +4,13 @@ node_modules
 .env
 .env.local
 .env.*.local
+
+# Build outputs
+dist/
+.astro/
+
+# Local settings
+.claude/settings.local.json
+
+# Windows artifacts
+nul

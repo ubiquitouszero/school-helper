@@ -1,0 +1,373 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 220">
+  <defs>
+    <!-- Rainbow gradient for background -->
+    <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF6B6B"/>
+      <stop offset="16%" style="stop-color:#FF9F43"/>
+      <stop offset="33%" style="stop-color:#FECA57"/>
+      <stop offset="50%" style="stop-color:#48DBFB"/>
+      <stop offset="66%" style="stop-color:#5F27CD"/>
+      <stop offset="83%" style="stop-color:#A55EEA"/>
+      <stop offset="100%" style="stop-color:#FF6B9D"/>
+    </linearGradient>
+
+    <!-- Rainbow text gradient -->
+    <linearGradient id="textRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF6B6B"/>
+      <stop offset="20%" style="stop-color:#FF9F43"/>
+      <stop offset="40%" style="stop-color:#FECA57"/>
+      <stop offset="60%" style="stop-color:#48DBFB"/>
+      <stop offset="80%" style="stop-color:#5F27CD"/>
+      <stop offset="100%" style="stop-color:#FF6B9D"/>
+    </linearGradient>
+
+    <!-- Cape gradient -->
+    <linearGradient id="capeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B"/>
+      <stop offset="100%" style="stop-color:#FF9F43"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background with soft rainbow -->
+  <rect width="850" height="220" fill="#FFF5F5"/>
+  <rect width="850" height="8" y="0" fill="url(#rainbow)"/>
+  <rect width="850" height="8" y="212" fill="url(#rainbow)"/>
+
+  <!-- Sparkles around the banner -->
+  <g fill="#FECA57">
+    <polygon points="150,30 153,38 162,38 155,43 158,52 150,47 142,52 145,43 138,38 147,38" opacity="0.8"/>
+    <polygon points="650,25 652,30 658,30 653,34 655,40 650,36 645,40 647,34 642,30 648,30" opacity="0.8"/>
+    <polygon points="720,80 722,85 728,85 723,89 725,95 720,91 715,95 717,89 712,85 718,85" opacity="0.6"/>
+    <polygon points="100,150 102,155 108,155 103,159 105,165 100,161 95,165 97,159 92,155 98,155" opacity="0.7"/>
+  </g>
+
+  <!-- ROCKET (top left area, flying upward) -->
+  <g transform="translate(85, 25) rotate(-30)">
+    <!-- Rocket body -->
+    <ellipse cx="20" cy="35" rx="12" ry="25" fill="#FF6B6B"/>
+
+    <!-- Rocket nose cone -->
+    <path d="M8 12 Q20 -5 32 12" fill="#FF6B6B"/>
+
+    <!-- Rocket window -->
+    <circle cx="20" cy="25" r="7" fill="#48DBFB"/>
+    <circle cx="20" cy="25" r="5" fill="#E8F4FD"/>
+    <circle cx="18" cy="23" r="2" fill="white" opacity="0.7"/>
+
+    <!-- Rocket fins -->
+    <path d="M8 50 L-5 65 L8 55 Z" fill="#5F27CD"/>
+    <path d="M32 50 L45 65 L32 55 Z" fill="#5F27CD"/>
+
+    <!-- Rocket bottom fin -->
+    <path d="M14 58 L20 70 L26 58 Z" fill="#A55EEA"/>
+
+    <!-- Flame/exhaust -->
+    <path d="M12 60 Q20 85 28 60 Q20 75 12 60" fill="#FF9F43"/>
+    <path d="M15 60 Q20 78 25 60 Q20 70 15 60" fill="#FECA57"/>
+
+    <!-- Rocket stripe -->
+    <rect x="8" y="40" width="24" height="4" fill="white"/>
+  </g>
+
+  <!-- ROBOT (bottom left) -->
+  <g transform="translate(30, 110)">
+    <!-- Robot body -->
+    <rect x="10" y="30" width="50" height="55" rx="8" fill="#5F27CD"/>
+    <rect x="15" y="35" width="40" height="20" rx="4" fill="#48DBFB"/>
+
+    <!-- Robot head -->
+    <rect x="12" y="5" width="46" height="30" rx="6" fill="#A55EEA"/>
+    <!-- Robot eyes -->
+    <circle cx="27" cy="18" r="7" fill="white"/>
+    <circle cx="43" cy="18" r="7" fill="white"/>
+    <circle cx="28" cy="19" r="4" fill="#333"/>
+    <circle cx="44" cy="19" r="4" fill="#333"/>
+    <!-- Robot antenna -->
+    <line x1="35" y1="5" x2="35" y2="-5" stroke="#5F27CD" stroke-width="3"/>
+    <circle cx="35" cy="-8" r="5" fill="#FECA57"/>
+
+    <!-- Robot smile -->
+    <path d="M25 28 Q35 35 45 28" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Robot arms -->
+    <rect x="0" y="40" width="12" height="8" rx="3" fill="#A55EEA"/>
+    <rect x="58" y="40" width="12" height="8" rx="3" fill="#A55EEA"/>
+
+    <!-- Robot legs -->
+    <rect x="18" y="82" width="12" height="15" rx="4" fill="#A55EEA"/>
+    <rect x="40" y="82" width="12" height="15" rx="4" fill="#A55EEA"/>
+
+    <!-- Heart on chest -->
+    <path d="M35 48 C32 45 27 45 27 50 C27 54 35 60 35 60 C35 60 43 54 43 50 C43 45 38 45 35 48" fill="#FF6B6B"/>
+  </g>
+
+  <!-- Main Text: "School Helper" -->
+  <g transform="translate(180, 85)">
+    <!-- "Sch" -->
+    <text x="0" y="50" font-family="Comic Sans MS, cursive, sans-serif" font-size="56" font-weight="bold" fill="url(#textRainbow)">
+      Sch
+    </text>
+
+    <!-- "oo" as glasses -->
+    <g transform="translate(115, 0)">
+      <!-- Left lens (o) -->
+      <ellipse cx="22" cy="35" rx="22" ry="24" fill="none" stroke="#5F27CD" stroke-width="5"/>
+      <ellipse cx="22" cy="35" rx="18" ry="20" fill="#E8F4FD"/>
+      <ellipse cx="17" cy="30" rx="5" ry="6" fill="white" opacity="0.6"/>
+
+      <!-- Bridge of glasses -->
+      <path d="M44 35 Q55 30 66 35" stroke="#5F27CD" stroke-width="4" fill="none"/>
+
+      <!-- Right lens (o) -->
+      <ellipse cx="88" cy="35" rx="22" ry="24" fill="none" stroke="#5F27CD" stroke-width="5"/>
+      <ellipse cx="88" cy="35" rx="18" ry="20" fill="#E8F4FD"/>
+      <ellipse cx="83" cy="30" rx="5" ry="6" fill="white" opacity="0.6"/>
+
+      <!-- Temple arms of glasses -->
+      <line x1="0" y1="30" x2="-10" y2="28" stroke="#5F27CD" stroke-width="4" stroke-linecap="round"/>
+      <line x1="110" y1="30" x2="120" y2="28" stroke="#5F27CD" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- "l Helper" -->
+    <text x="230" y="50" font-family="Comic Sans MS, cursive, sans-serif" font-size="56" font-weight="bold" fill="url(#textRainbow)">
+      l Helper
+    </text>
+  </g>
+
+  <!-- OWL perched on the glasses -->
+  <g transform="translate(325, 25)">
+    <!-- Owl body -->
+    <ellipse cx="25" cy="45" rx="22" ry="28" fill="#FF9F43"/>
+
+    <!-- Owl belly -->
+    <ellipse cx="25" cy="52" rx="14" ry="18" fill="#FECA57"/>
+
+    <!-- Belly pattern -->
+    <path d="M18 42 Q25 45 32 42" stroke="#FF9F43" stroke-width="2" fill="none"/>
+    <path d="M16 50 Q25 53 34 50" stroke="#FF9F43" stroke-width="2" fill="none"/>
+    <path d="M17 58 Q25 61 33 58" stroke="#FF9F43" stroke-width="2" fill="none"/>
+
+    <!-- Owl head -->
+    <ellipse cx="25" cy="18" rx="20" ry="18" fill="#FF9F43"/>
+
+    <!-- Ear tufts -->
+    <polygon points="10,5 15,18 5,15" fill="#FF9F43"/>
+    <polygon points="40,5 35,18 45,15" fill="#FF9F43"/>
+
+    <!-- Owl eyes -->
+    <circle cx="17" cy="18" r="10" fill="white"/>
+    <circle cx="33" cy="18" r="10" fill="white"/>
+    <circle cx="18" cy="19" r="6" fill="#333"/>
+    <circle cx="34" cy="19" r="6" fill="#333"/>
+    <circle cx="20" cy="17" r="2" fill="white"/>
+    <circle cx="36" cy="17" r="2" fill="white"/>
+
+    <!-- Owl beak -->
+    <polygon points="25,24 22,30 28,30" fill="#FF6B6B"/>
+
+    <!-- Owl feet on glasses frame -->
+    <g transform="translate(0, 60)">
+      <ellipse cx="15" cy="5" rx="6" ry="3" fill="#FF6B6B"/>
+      <ellipse cx="35" cy="5" rx="6" ry="3" fill="#FF6B6B"/>
+    </g>
+
+    <!-- Graduation cap on owl -->
+    <g transform="translate(25, -5)">
+      <rect x="-18" y="0" width="36" height="5" fill="#333"/>
+      <polygon points="0,-10 -22,0 0,5 22,0" fill="#333"/>
+      <line x1="18" y1="0" x2="25" y2="12" stroke="#FECA57" stroke-width="2"/>
+      <circle cx="26" cy="14" r="4" fill="#FECA57"/>
+    </g>
+  </g>
+
+  <!-- SUPERHERO KID (flying at top right) -->
+  <g transform="translate(620, 15)">
+    <!-- Cape (flowing behind) -->
+    <path d="M45 45 Q20 55 10 85 Q30 75 50 90 Q60 70 55 45" fill="url(#capeGradient)"/>
+
+    <!-- Flying pose body -->
+    <ellipse cx="55" cy="55" rx="18" ry="22" fill="#48DBFB"/>
+
+    <!-- Arms stretched forward (flying) -->
+    <ellipse cx="85" cy="40" rx="20" ry="6" fill="#FECA57" transform="rotate(-20, 85, 40)"/>
+    <circle cx="100" cy="35" r="6" fill="#FECA57"/>
+
+    <!-- Legs (stretched back) -->
+    <ellipse cx="35" cy="80" rx="6" ry="15" fill="#5F27CD" transform="rotate(30, 35, 80)"/>
+    <ellipse cx="50" cy="85" rx="6" ry="15" fill="#5F27CD" transform="rotate(20, 50, 85)"/>
+
+    <!-- Boots -->
+    <ellipse cx="28" cy="92" rx="7" ry="5" fill="#FF6B6B"/>
+    <ellipse cx="48" cy="98" rx="7" ry="5" fill="#FF6B6B"/>
+
+    <!-- Head -->
+    <circle cx="70" cy="30" r="16" fill="#FECA57"/>
+
+    <!-- Superhero mask -->
+    <path d="M55 28 Q70 22 85 28 Q85 35 70 35 Q55 35 55 28" fill="#FF6B6B"/>
+
+    <!-- Eyes through mask -->
+    <ellipse cx="62" cy="30" rx="4" ry="5" fill="white"/>
+    <ellipse cx="78" cy="30" rx="4" ry="5" fill="white"/>
+    <circle cx="63" cy="31" r="2" fill="#333"/>
+    <circle cx="79" cy="31" r="2" fill="#333"/>
+
+    <!-- Happy smile -->
+    <path d="M64 38 Q70 44 76 38" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Hair (wind-blown) -->
+    <path d="M58 18 Q50 10 55 5" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M65 15 Q60 5 65 0" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M75 15 Q75 5 80 2" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+    <!-- Motion lines -->
+    <line x1="5" y1="50" x2="-15" y2="55" stroke="#48DBFB" stroke-width="3" opacity="0.6"/>
+    <line x1="0" y1="60" x2="-20" y2="65" stroke="#48DBFB" stroke-width="3" opacity="0.5"/>
+    <line x1="5" y1="70" x2="-15" y2="75" stroke="#48DBFB" stroke-width="3" opacity="0.4"/>
+
+    <!-- "S" on chest (for School Helper!) -->
+    <text x="48" y="62" font-family="Arial Black, sans-serif" font-size="18" font-weight="bold" fill="#FECA57">S</text>
+  </g>
+
+  <!-- GARBAGE TRUCK (left side, under robot) - small and cute -->
+  <g transform="translate(115, 165)">
+    <!-- Truck cab (front) -->
+    <rect x="0" y="0" width="28" height="25" rx="4" fill="#48DBFB"/>
+    <!-- Cab window -->
+    <rect x="4" y="4" width="16" height="10" rx="2" fill="#E8F4FD"/>
+    <!-- Window shine -->
+    <rect x="6" y="5" width="4" height="7" rx="1" fill="white" opacity="0.5"/>
+
+    <!-- Truck body (garbage container) -->
+    <rect x="28" y="-8" width="50" height="33" rx="3" fill="#5F27CD"/>
+
+    <!-- Garbage hopper on top -->
+    <rect x="30" y="-15" width="20" height="10" rx="2" fill="#A55EEA"/>
+
+    <!-- Recycling symbol on side -->
+    <g transform="translate(53, 8)" fill="#48DBFB">
+      <polygon points="0,-8 5,0 -5,0"/>
+      <polygon points="0,-8 5,0 -5,0" transform="rotate(120)"/>
+      <polygon points="0,-8 5,0 -5,0" transform="rotate(240)"/>
+    </g>
+
+    <!-- Truck wheels -->
+    <circle cx="14" cy="28" r="7" fill="#333"/>
+    <circle cx="14" cy="28" r="3" fill="#666"/>
+    <circle cx="60" cy="28" r="7" fill="#333"/>
+    <circle cx="60" cy="28" r="3" fill="#666"/>
+
+    <!-- Bumper -->
+    <rect x="-3" y="20" width="10" height="4" rx="1" fill="#FF9F43"/>
+
+    <!-- Headlight -->
+    <circle cx="3" cy="18" r="3" fill="#FECA57"/>
+
+    <!-- Happy face on cab -->
+    <circle cx="12" cy="8" r="1.5" fill="#333"/>
+    <circle cx="18" cy="8" r="1.5" fill="#333"/>
+    <path d="M11 13 Q15 17 19 13" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- KITTY (bottom right) - cute sitting cat with clear ears -->
+  <g transform="translate(750, 130)">
+    <!-- Kitty tail (behind body) - curvy and fluffy -->
+    <path d="M60 50 Q90 25 80 65" stroke="#FF9F43" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+    <!-- Kitty body (sitting) -->
+    <ellipse cx="40" cy="60" rx="30" ry="28" fill="#FF9F43"/>
+
+    <!-- Kitty belly -->
+    <ellipse cx="40" cy="65" rx="20" ry="20" fill="#FECA57"/>
+
+    <!-- EARS - drawn FIRST (before head) so they stick up clearly -->
+    <!-- Left ear - big pointy triangle -->
+    <path d="M15 35 L5 0 L30 25 Z" fill="#FF9F43"/>
+    <!-- Left inner ear -->
+    <path d="M16 30 L10 8 L26 25 Z" fill="#FF6B9D"/>
+
+    <!-- Right ear - big pointy triangle -->
+    <path d="M65 35 L75 0 L50 25 Z" fill="#FF9F43"/>
+    <!-- Right inner ear -->
+    <path d="M64 30 L70 8 L54 25 Z" fill="#FF6B9D"/>
+
+    <!-- Kitty head (drawn after ears so it overlaps the base) -->
+    <circle cx="40" cy="35" r="26" fill="#FF9F43"/>
+
+    <!-- Kitty face -->
+    <!-- Eyes - big cute sparkly eyes -->
+    <ellipse cx="30" cy="32" rx="9" ry="11" fill="white"/>
+    <ellipse cx="50" cy="32" rx="9" ry="11" fill="white"/>
+    <!-- Iris -->
+    <ellipse cx="31" cy="34" rx="6" ry="8" fill="#48DBFB"/>
+    <ellipse cx="51" cy="34" rx="6" ry="8" fill="#48DBFB"/>
+    <!-- Pupils -->
+    <ellipse cx="32" cy="34" r="3" fill="#333"/>
+    <ellipse cx="52" cy="34" r="3" fill="#333"/>
+    <!-- Eye shine (makes them sparkly) -->
+    <circle cx="34" cy="31" r="3" fill="white"/>
+    <circle cx="54" cy="31" r="3" fill="white"/>
+    <circle cx="29" cy="37" r="1.5" fill="white"/>
+    <circle cx="49" cy="37" r="1.5" fill="white"/>
+
+    <!-- Kitty nose (small pink heart-ish) -->
+    <ellipse cx="40" cy="44" rx="4" ry="3" fill="#FF6B9D"/>
+
+    <!-- Kitty mouth (cute cat mouth :3) -->
+    <path d="M35 48 Q40 52 40 48" stroke="#333" stroke-width="2" fill="none"/>
+    <path d="M40 48 Q40 52 45 48" stroke="#333" stroke-width="2" fill="none"/>
+
+    <!-- Whiskers -->
+    <line x1="5" y1="40" x2="22" y2="44" stroke="#333" stroke-width="1.5"/>
+    <line x1="3" y1="48" x2="22" y2="48" stroke="#333" stroke-width="1.5"/>
+    <line x1="5" y1="56" x2="22" y2="52" stroke="#333" stroke-width="1.5"/>
+    <line x1="75" y1="40" x2="58" y2="44" stroke="#333" stroke-width="1.5"/>
+    <line x1="77" y1="48" x2="58" y2="48" stroke="#333" stroke-width="1.5"/>
+    <line x1="75" y1="56" x2="58" y2="52" stroke="#333" stroke-width="1.5"/>
+
+    <!-- Front paws -->
+    <ellipse cx="25" cy="85" rx="12" ry="7" fill="#FF9F43"/>
+    <ellipse cx="55" cy="85" rx="12" ry="7" fill="#FF9F43"/>
+    <!-- Paw beans -->
+    <ellipse cx="25" cy="87" rx="8" ry="4" fill="#FECA57"/>
+    <ellipse cx="55" cy="87" rx="8" ry="4" fill="#FECA57"/>
+
+    <!-- Collar with bell -->
+    <path d="M20 58 Q40 65 60 58" stroke="#FF6B6B" stroke-width="4" fill="none"/>
+    <circle cx="40" cy="62" r="5" fill="#FECA57"/>
+    <circle cx="40" cy="64" r="2" fill="#FF9F43"/>
+  </g>
+
+  <!-- PENCIL (bottom center) -->
+  <g transform="translate(560, 165)">
+    <!-- Pencil body (yellow) -->
+    <rect x="0" y="0" width="60" height="14" rx="2" fill="#FECA57"/>
+    <!-- Pencil stripe -->
+    <rect x="0" y="5" width="60" height="4" fill="#FF9F43"/>
+
+    <!-- Eraser end (pink) -->
+    <rect x="-12" y="0" width="14" height="14" rx="2" fill="#FF6B9D"/>
+    <!-- Metal band -->
+    <rect x="-2" y="0" width="6" height="14" fill="#A55EEA"/>
+    <line x1="0" y1="0" x2="0" y2="14" stroke="#5F27CD" stroke-width="1"/>
+    <line x1="3" y1="0" x2="3" y2="14" stroke="#5F27CD" stroke-width="1"/>
+
+    <!-- Sharpened tip (wood + graphite) -->
+    <polygon points="60,0 60,14 80,7" fill="#FECA57"/>
+    <polygon points="72,4 72,10 80,7" fill="#8B4513"/>
+    <polygon points="76,5 76,9 80,7" fill="#333"/>
+  </g>
+
+  <!-- Small math symbols scattered -->
+  <g font-family="Comic Sans MS, cursive" font-size="20" font-weight="bold">
+    <text x="140" y="60" fill="#FF6B6B" opacity="0.7">+</text>
+    <text x="250" y="180" fill="#5F27CD" opacity="0.7">×</text>
+    <text x="520" y="195" fill="#48DBFB" opacity="0.7">÷</text>
+    <text x="680" y="195" fill="#FECA57" opacity="0.7">=</text>
+  </g>
+
+  <!-- Tagline -->
+  <text x="425" y="205" font-family="Comic Sans MS, cursive, sans-serif" font-size="16" fill="#5F27CD" text-anchor="middle">
+    Learning is an adventure!
+  </text>
+</svg>
