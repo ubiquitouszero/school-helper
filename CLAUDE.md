@@ -99,8 +99,24 @@ school-helper/
 - **Kaland Carroll** - Product manager (9 years old)
 - **Valen Carroll** - Beta tester (5 years old)
 
+## Deployment
+
+**Hosting:** Netlify
+
+```bash
+npm run build                        # Build to dist/
+npx netlify deploy --dir=dist        # Preview deploy
+npx netlify deploy --dir=dist --prod # Production deploy
+```
+
+If site not linked: `npx netlify link`
+If auth errors: `npx netlify login`
+
+See [docs/netlify-deploy.md](docs/netlify-deploy.md) for troubleshooting.
+
 ## Related Documentation
 
 - [Requirements](docs/requirements.md)
 - [MVP Scope](docs/mvp-scope.md)
 - [Logo Design Worksheet](docs/logo-design-worksheet.md)
+- [Netlify Deployment](docs/netlify-deploy.md)
