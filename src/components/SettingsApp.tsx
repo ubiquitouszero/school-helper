@@ -1,10 +1,27 @@
 import { useState, useEffect } from 'react';
-import { getAvailableVoices, getSavedVoiceName, saveVoiceName, speak, type VoiceOption } from '../lib/speech';
+import {
+  getAvailableVoices,
+  getSavedVoiceName,
+  saveVoiceName,
+  speak,
+  getSightWordsVoice,
+  saveSightWordsVoice,
+  previewSightWordsVoice,
+  SIGHT_WORDS_VOICES,
+  type VoiceOption,
+  type SightWordsVoice
+} from '../lib/speech';
 
 export default function SettingsApp() {
   const [voices, setVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [sightWordsVoice, setSightWordsVoice] = useState<SightWordsVoice>('dad');
+
+  // Load sight words voice preference
+  useEffect(() => {
+    setSightWordsVoice(getSightWordsVoice());
+  }, []);
 
   // Load voices (they may not be available immediately)
   useEffect(() => {
@@ -69,6 +86,69 @@ export default function SettingsApp() {
             ⚙️ Settings
           </h1>
           <div className="w-20"></div>
+        </div>
+
+        {/* Sight Words Voice Selection */}
+        <div className="bg-white rounded-kid-lg shadow-lg p-6 mb-6">
+          <h2 className="text-2xl font-fun font-bold text-kid-text mb-4">
+            📖 Sight Words Voice
+          </h2>
+          <p className="text-lg text-gray-600 mb-6">
+            Who should read the sight words?
+          </p>
+
+          <div className="grid gap-3">
+            {SIGHT_WORDS_VOICES.map((voice) => (
+              <button
+                key={voice.id}
+                onClick={() => {
+                  setSightWordsVoice(voice.id);
+                  saveSightWordsVoice(voice.id);
+                  previewSightWordsVoice(voice.id);
+                }}
+                className={`
+                  flex items-center justify-between
+                  p-4 rounded-kid
+                  transition-all duration-200
+                  ${sightWordsVoice === voice.id
+                    ? 'bg-rainbow-orange text-white shadow-lg'
+                    : 'bg-gray-100 text-kid-text hover:bg-rainbow-yellow'
+                  }
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">
+                    {sightWordsVoice === voice.id ? '✓' : '🔊'}
+                  </span>
+                  <div className="text-left">
+                    <span className="font-fun font-bold text-lg block">
+                      {voice.name}
+                    </span>
+                    <span className={`text-sm ${sightWordsVoice === voice.id ? 'text-white/80' : 'text-gray-500'}`}>
+                      {voice.description}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    previewSightWordsVoice(voice.id);
+                  }}
+                  className={`
+                    px-4 py-2 rounded-kid
+                    font-bold text-sm
+                    transition-all
+                    ${sightWordsVoice === voice.id
+                      ? 'bg-white/20 hover:bg-white/30'
+                      : 'bg-rainbow-blue text-white hover:bg-rainbow-purple'
+                    }
+                  `}
+                >
+                  Test 🔊
+                </button>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Voice Selection */}

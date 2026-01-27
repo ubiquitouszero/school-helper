@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { speakWithCallback, speak } from '../lib/speech';
+import { playWordAudio, speakWithCallback, testSpeechSupport } from '../lib/speech';
 
 // MES Kindergarten Essential Sight Words from Valen's school
 const SIGHT_WORDS = [
@@ -37,6 +37,15 @@ export default function SightWordsApp() {
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [speaking, setSpeaking] = useState(false);
+  const [speechWorks, setSpeechWorks] = useState<boolean | null>(null);
+  const [showWord, setShowWord] = useState(false);
+
+  // Test speech support on mount
+  useEffect(() => {
+    testSpeechSupport().then(works => {
+      setSpeechWorks(works);
+    });
+  }, []);
 
   // Initialize problem on client side only
   useEffect(() => {
@@ -49,12 +58,33 @@ export default function SightWordsApp() {
 
   const speakWord = useCallback((word: string) => {
     setSpeaking(true);
-    speakWithCallback(
+
+    // Try pre-recorded audio first (works on all devices including Kindle)
+    playWordAudio(
       word,
-      () => setSpeaking(false),
-      () => setSpeaking(false)
+      () => setSpeaking(false),  // onEnd
+      () => {
+        // Audio file not found - fall back to speech synthesis
+        if (speechWorks !== false) {
+          speakWithCallback(
+            word,
+            () => setSpeaking(false),
+            () => {
+              // Both failed - show word visually
+              setSpeaking(false);
+              setShowWord(true);
+              setTimeout(() => setShowWord(false), 2000);
+            }
+          );
+        } else {
+          // No audio, no speech - show word visually
+          setSpeaking(false);
+          setShowWord(true);
+          setTimeout(() => setShowWord(false), 2000);
+        }
+      }
     );
-  }, []);
+  }, [speechWorks]);
 
   const nextProblem = useCallback(() => {
     if (total >= WORDS_PER_ROUND) {
@@ -63,6 +93,7 @@ export default function SightWordsApp() {
     }
     setProblem(generateProblem());
     setFeedback(null);
+    setShowWord(false);
   }, [total]);
 
   useEffect(() => {
@@ -274,7 +305,15 @@ export default function SightWordsApp() {
     );
   }
 
-  // Game screen
+  // Game screen - wait for problem to be generated
+  if (!problem) {
+    return (
+      <div className="min-h-screen bg-kid-bg p-4 flex items-center justify-center">
+        <div className="text-2xl font-fun text-rainbow-orange">Loading...</div>
+      </div>
+    );
+  }
+
   const progress = (total / WORDS_PER_ROUND) * 100;
 
   return (
@@ -300,7 +339,7 @@ export default function SightWordsApp() {
         {/* Word prompt */}
         <div className="text-center mb-8">
           <p className="text-2xl font-fun text-kid-text mb-4">
-            Tap the word you hear:
+            {speechWorks === false ? 'Tap to see the word:' : 'Tap the word you hear:'}
           </p>
 
           <button
@@ -312,8 +351,15 @@ export default function SightWordsApp() {
               ${speaking ? 'animate-pulse' : 'hover:scale-110'}
             `}
           >
-            🔊
+            {speechWorks === false ? '👀' : '🔊'}
           </button>
+
+          {/* Show word visually when speech doesn't work */}
+          {showWord && (
+            <div className="mt-4 text-5xl font-bold font-fun text-rainbow-purple animate-pulse">
+              {problem.targetWord}
+            </div>
+          )}
 
           {feedback === 'wrong' && (
             <div className="mt-4 text-2xl text-red-600 font-bold">
