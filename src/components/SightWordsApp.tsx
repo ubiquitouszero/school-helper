@@ -194,7 +194,7 @@ export default function SightWordsApp() {
           <title>Sight Words Trophy - ${player}</title>
           <style>
             body {
-              font-family: 'Comic Sans MS', 'Chalkboard', sans-serif;
+              font-family: var(--font-fun, sans-serif);
               text-align: center;
               padding: 40px;
               background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);

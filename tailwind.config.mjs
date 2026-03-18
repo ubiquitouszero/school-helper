@@ -23,7 +23,7 @@ export default {
       },
       // Kid-friendly fonts
       fontFamily: {
-        'fun': ['Comic Sans MS', 'cursive', 'sans-serif'],
+        'fun': ['var(--font-fun)', 'sans-serif'],
         'readable': ['system-ui', '-apple-system', 'sans-serif'],
       },
       // Larger tap targets for kids

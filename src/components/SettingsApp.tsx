@@ -11,16 +11,19 @@ import {
   type VoiceOption,
   type SightWordsVoice
 } from '../lib/speech';
+import { FONT_OPTIONS, getSavedFont, saveFont } from '../lib/fonts';
 
 export default function SettingsApp() {
   const [voices, setVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [sightWordsVoice, setSightWordsVoice] = useState<SightWordsVoice>('dad');
+  const [selectedFont, setSelectedFont] = useState('system');
 
-  // Load sight words voice preference
+  // Load sight words voice preference and font
   useEffect(() => {
     setSightWordsVoice(getSightWordsVoice());
+    setSelectedFont(getSavedFont());
   }, []);
 
   // Load voices (they may not be available immediately)
@@ -217,6 +220,57 @@ export default function SettingsApp() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Font Selection */}
+        <div className="bg-white rounded-kid-lg shadow-lg p-6 mb-6">
+          <h2 className="text-2xl font-fun font-bold text-kid-text mb-4">
+            🔤 Pick a Font
+          </h2>
+          <p className="text-lg text-gray-600 mb-6">
+            Choose how words look on screen!
+          </p>
+
+          <div className="grid gap-3">
+            {FONT_OPTIONS.map((font) => (
+              <button
+                key={font.id}
+                onClick={() => {
+                  setSelectedFont(font.id);
+                  saveFont(font.id);
+                }}
+                className={`
+                  flex items-center justify-between
+                  p-4 rounded-kid
+                  transition-all duration-200
+                  ${selectedFont === font.id
+                    ? 'bg-rainbow-blue text-white shadow-lg'
+                    : 'bg-gray-100 text-kid-text hover:bg-rainbow-yellow'
+                  }
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">
+                    {selectedFont === font.id ? '✓' : '🔤'}
+                  </span>
+                  <div className="text-left">
+                    <span className="font-bold text-lg block" style={{ fontFamily: font.family }}>
+                      {font.name}
+                    </span>
+                    <span className={`text-sm ${selectedFont === font.id ? 'text-white/80' : 'text-gray-500'}`}>
+                      {font.description}
+                    </span>
+                  </div>
+                </div>
+                <span
+                  className="text-2xl font-bold"
+                  style={{ fontFamily: font.family }}
+                >
+                  Abc 123
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Other Settings (placeholder for future) */}

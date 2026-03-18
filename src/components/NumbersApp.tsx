@@ -248,7 +248,7 @@ export default function NumbersApp() {
           <title>Numbers Trophy - ${player}</title>
           <style>
             body {
-              font-family: 'Comic Sans MS', 'Chalkboard', sans-serif;
+              font-family: var(--font-fun, sans-serif);
               text-align: center;
               padding: 40px;
               background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);

@@ -81,7 +81,7 @@ export default function Results({ player, score, total, difficulty, problems, on
         <title>Math Trophy - ${player}</title>
         <style>
           body {
-            font-family: 'Comic Sans MS', 'Chalkboard', sans-serif;
+            font-family: var(--font-fun, sans-serif);
             text-align: center;
             padding: 40px;
             background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
